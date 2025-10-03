@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/assets/favicon.svg" />
+    <link rel="stylesheet" href="/assets/css/app.css" />
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>InertiaNode</title>
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <nav class="bg-[#84BA64] text-white p-4 flex justify-between items-center">
+      <a href="/">
+        <img class="h-12 w-auto" src="/assets/logo.svg" alt="InertiaNode" />
+      </a>
+      <ul class="flex justify-center gap-4">
+        <li><a href="/docs">Docs</a></li>
+        <li>
+          <a
+            href="https://github.com/InertiaNode/adapter"
+            class="flex gap-x-2"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <spam>Repo</spam>
+            <!-- SVG For external Link -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-external-link"
+            >
+              <path
+                d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+              />
+              <path d="M15 3h6v6" />
+              <path d="M10 14L21 3" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <main
+      class="p-4 flex flex-col items-center justify-center flex-1 dark:bg-gray-900"
+    >
+      <section id="hero" class="flex flex-col items-center gap-4">
+        <img
+          src="/assets/logo-color.svg"
+          alt="InertiaNode"
+          class="h-24 w-auto"
+        />
+        <h2 class="text-2xl font-bold text-[#84BA64] dark:text-white">
+          Inertia.js for Node.js
+        </h2>
+        <p class="text-center text-gray-800 dark:text-gray-200">
+          InertiaNode is an adapter for building web user interfaces in
+          Node.js<br />
+          paired with your favorite front-end library.
+        </p>
+
+        <p class="flex gap-4 my-12">
+          <a
+            class="bg-[#84BA64] text-white px-4 py-2 rounded-md text-2xl"
+            href="/docs/"
+          >
+            Get Started
+          </a>
+        </p>
+        <p class="flex gap-4">
+          <a
+            class="bg-white border-[#84BA64] border-2 text-[#84BA64] px-4 py-2 rounded-md dark:bg-gray-900 dark:text-white dark:border-white"
+            href="https://inertiajs.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn Inertia.js
+          </a>
+          <a
+            class="bg-white border-[#84BA64] border-2 text-[#84BA64] px-4 py-2 rounded-md dark:bg-gray-900 dark:text-white dark:border-white"
+            href="https://nodejs.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn Node.js
+          </a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

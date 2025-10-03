@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/docsify@4/themes/vue.css"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css"
+      title="docsify-darklight-theme"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="/docs/assets/prism-monokai.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      window.$docsify = {
+        loadSidebar: true,
+        subMaxLevel: 3,
+        search: "auto", // default
+        logo: "../assets/logo-color.svg",
+        name: "InertiaNode",
+        nameLink: "/",
+        description: "Inertia.js for Node.js",
+        repo: "https://github.com/InertiaNode/adapter",
+        notFoundText: "404 - Page Not Found",
+        darklightTheme: {
+          // siteFont: "Open Sans | PT Sans | Source Sans Pro",
+          defaultTheme: "dark",
+          codeFontFamily: "Roboto Mono, Monaco, courier, monospace",
+          dark: {
+            accent: "#84BA64",
+            toogleBackground: "#ffffff",
+            background: "#091a28",
+            textColor: "#b4b4b4",
+            codeTextColor: "#ffffff",
+            codeBackgroundColor: "#0e2233",
+            borderColor: "#0d2538",
+            blockQuoteColor: "#858585",
+            // highlightColor: "#84BA64",
+            highlightColor: "#FFF",
+            sidebarSublink: "#b4b4b4",
+            codeTypeColor: "#ffffff",
+            coverBackground:
+              "linear-gradient(to left bottom, hsl(118, 100%, 85%) 0%,hsl(181, 100%, 85%) 100%)",
+            toogleImage:
+              "url(https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/icons/sun.svg)",
+          },
+          light: {
+            accent: "#512bd4",
+          },
+        },
+        frameworkSwitcher: {
+          frameworks: [
+            "react",
+            "vue",
+            "svelte",
+            "svelte4",
+            "svelte5",
+            "hono",
+            "express",
+            "koa",
+          ],
+          defaultFramework: "react",
+          frameworkNames: {
+            react: "React",
+            vue: "Vue",
+            svelte: "Svelte",
+            svelte4: "Svelte 4",
+            svelte5: "Svelte 5",
+            express: "Express",
+            hono: "Hono",
+            koa: "Koa",
+          },
+          markerPattern:
+            /^\s*(?:\/\/\s*|#\s*|<!--\s*)?framework:\s*(express|hono|koa|react|vue|svelte[45]?|vuex)(?:\s*-->)?/i,
+          labelPattern:
+            /^(Express|Hono|Koa|React|Vue|Svelte(?:\s*[45])?):?\s*$/i,
+        },
+        copyCode: {
+          buttonText: "📋",
+          errorText: "❌",
+          successText: "✅",
+        },
+        versions: [
+          { folder: "v2", label: "v2.0.0", default: true },
+          { folder: "v1", label: "v1.0.0", default: false },
+        ],
+        versionSelectorLabel: "Version",
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="/docs/assets/prism-svelte.js"></script>
+    <script src="/docs/assets/framework-switcher.js"></script>
+    <script src="/docs/assets/on-this-page.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-diff.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-jsx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-tsx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-ini.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"></script>
+    <style>
+      :root {
+        --theme-color: #84ba64;
+        --sidebar-bg: #091a28;
+        --border-color: #0d2538;
+      }
+      .app-name .app-name-link img {
+        width: 80%;
+      }
+      ul li p:not(:has(a)) {
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        margin-top: 2rem !important;
+      }
+
+      .sidebar ul li.active > a {
+        border-right: 6px solid;
+      }
+      #docsify-darklight-theme {
+        display: none;
+      }
+    </style>
+    <style>
+      aside.sidebar {
+        padding-top: 0;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="72px" height="72px" viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>favicon</title>
+    <defs>
+        <path d="M0,0 L72,0 L72,72 L0,72 L0,0 Z" id="path-1"></path>
+    </defs>
+    <g id="favicon" stroke="none" fill="none" xlink:href="#path-1" fill-rule="evenodd">
+        <use fill="#FFFFFF" xlink:href="#path-1"></use>
+        <g id="Page-1" stroke-width="1">
+            <g>
+                <rect id="Rectangle" fill="#84BA64" fill-rule="nonzero" x="0" y="0" width="72" height="72"></rect>
+                <polygon id="Path" fill="#FFFFFF" fill-rule="nonzero" points="23.2 20.1 5.4 20.1 22.6 37.3 5.4 54.5 23.2 54.5 40.4 37.3"></polygon>
+                <polygon id="Path" fill="#FFFFFF" fill-rule="nonzero" points="50.1 20.1 32.3 20.1 49.5 37.3 32.3 54.5 50.1 54.5 67.3 37.3"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
