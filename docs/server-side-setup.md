@@ -57,13 +57,11 @@ export function rootTemplate(page: Page, viewData: any = {}): string {
 
 InertiaNode provides several helper functions to simplify template creation:
 
-- **`viteAssets(entrypoints)`** - Automatically detects development or production mode and loads the appropriate assets. Handles the Vite dev server in development and loads hashed assets from the manifest in production. **Automatically includes React Fast Refresh** when React is detected in your project.
+- **`viteAssets(entrypoints)`** - Automatically detects development or production mode and loads the appropriate assets. Handles the Vite dev server in development and loads hashed assets from the manifest in production.
 
 - **`inertiaHead(ssrHead?)`** - Renders SSR head content when server-side rendering is enabled. For non-SSR applications, this returns an empty string and head content is managed client-side using the `<Head>` component.
 
 - **`inertiaBody(page, ssrBody?, appId?)`** - Renders the Inertia app mount point. When SSR is enabled, it renders the pre-rendered HTML. Otherwise, it renders a div with serialized page data. The `appId` parameter is optional (defaults to `'app'`).
-
-The `viteAssets()` helper automatically handles React Fast Refresh in development mode by detecting React in your `package.json` dependencies. For manual control or other advanced configurations, see the [Vite Helper](/node/vite-helper.md) documentation.
 
 ## App Setup
 
@@ -80,7 +78,10 @@ const app = new Hono();
 
 // Add Inertia middleware with configuration
 app.use('*', inertiaHonoAdapter({
-  html: (page) => rootTemplate(page)
+  html: (page) => rootTemplate(page),
+  vite: {
+    reactRefresh: true, // Enable React Fast Refresh (for React apps)
+  }
 }));
 
 // Serve static files
@@ -107,7 +108,10 @@ app.use(express.json());
 
 // Add Inertia middleware with configuration
 app.use(inertiaExpressAdapter({
-  html: (page) => rootTemplate(page)
+  html: (page) => rootTemplate(page),
+  vite: {
+    reactRefresh: true, // Enable React Fast Refresh (for React apps)
+  }
 }));
 
 // Serve static files
@@ -138,7 +142,10 @@ const router = new Router();
 
 // Add Inertia middleware with configuration
 app.use(inertiaKoaAdapter({
-  html: (page) => rootTemplate(page)
+  html: (page) => rootTemplate(page),
+  vite: {
+    reactRefresh: true, // Enable React Fast Refresh (for React apps)
+  }
 }));
 
 // Serve static files

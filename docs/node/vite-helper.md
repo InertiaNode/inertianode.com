@@ -14,6 +14,7 @@ Inertia.setViteOptions({
   buildDirectory: "build",
   hotFile: "hot",
   manifestFilename: "manifest.json",
+  reactRefresh: true, // Enable React Fast Refresh in development
 });
 ```
 
@@ -32,6 +33,7 @@ app.use(
       buildDirectory: "build",
       hotFile: "hot",
       manifestFilename: "manifest.json",
+      reactRefresh: true, // Enable React Fast Refresh
     },
   })
 );
@@ -50,6 +52,7 @@ app.use(
       buildDirectory: "build",
       hotFile: "hot",
       manifestFilename: "manifest.json",
+      reactRefresh: true, // Enable React Fast Refresh
     },
   })
 );
@@ -68,6 +71,7 @@ app.use(
       buildDirectory: "build",
       hotFile: "hot",
       manifestFilename: "manifest.json",
+      reactRefresh: true, // Enable React Fast Refresh
     },
   })
 );
@@ -102,7 +106,7 @@ The `viteAssets()` helper:
 - Automatically detects development vs production mode
 - Loads assets from Vite dev server (with HMR) in development
 - Loads hashed assets from the manifest in production
-- Handles React Fast Refresh automatically when React is detected
+- Supports React Fast Refresh when `reactRefresh: true` is set in Vite options
 - Supports multiple entrypoints
 
 ### Multiple Entrypoints
