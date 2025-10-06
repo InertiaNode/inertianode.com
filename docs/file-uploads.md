@@ -182,13 +182,13 @@ For Node.js applications, you would typically handle file uploads using multipar
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 // Hono uses per-request Inertia instance (c.Inertia);
 
 const app = new Hono();
 
-app.post('/users/:id', async (c) => {
-  const id = c.req.param('id');
+app.post("/users/:id", async (c) => {
+  const id = c.req.param("id");
   const body = await c.req.parseBody();
   const name = body.name as string;
   const avatar = body.avatar as File;
@@ -204,19 +204,19 @@ app.post('/users/:id', async (c) => {
   user.name = name;
   await userService.updateUser(user);
 
-  return await c.Inertia('Users/Show', { user });
+  return await c.Inertia("Users/Show", { user });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
-import multer from 'multer';
+import express from "express";
+import multer from "multer";
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: "uploads/" });
 
-app.post('/users/:id', upload.single('avatar'), async (req, res) => {
+app.post("/users/:id", upload.single("avatar"), async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
   const avatar = req.file;
@@ -232,26 +232,37 @@ app.post('/users/:id', upload.single('avatar'), async (req, res) => {
   user.name = name;
   await userService.updateUser(user);
 
-  await res.Inertia('Users/Show', { user });
+  await res.Inertia("Users/Show", { user });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Post, Param, Body, UploadedFile, UseInterceptors, Req, Res } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Request, Response } from 'express';
+import {
+  Controller,
+  Post,
+  Param,
+  Body,
+  UploadedFile,
+  UseInterceptors,
+  Req,
+  Res,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Request, Response } from "express";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
-  @Post(':id')
-  @UseInterceptors(FileInterceptor('avatar', { dest: 'uploads/' }))
+  @Post(":id")
+  @UseInterceptors(FileInterceptor("avatar", { dest: "uploads/" }))
   async update(
-    @Param('id') id: string,
-    @Body('name') name: string,
+    @Param("id") id: string,
+    @Body("name") name: string,
     @UploadedFile() avatar: Express.Multer.File,
     @Req() req: Request,
-    @Res() res: Response
+    @Res() res: Response,
+    @Inert() inertia: Inertia
   ) {
     const user = await userService.getUser(id);
 
@@ -264,22 +275,22 @@ export class UsersController {
     user.name = name;
     await userService.updateUser(user);
 
-    await res.Inertia.render('Users/Show', { user });
+    await inertia("Users/Show", { user });
   }
 }
 ```
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
-import multer from '@koa/multer';
+import Koa from "koa";
+import Router from "@koa/router";
+import multer from "@koa/multer";
 
 const app = new Koa();
 const router = new Router();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: "uploads/" });
 
-router.post('/users/:id', upload.single('avatar'), async (ctx) => {
+router.post("/users/:id", upload.single("avatar"), async (ctx) => {
   const { id } = ctx.params;
   const { name } = ctx.request.body;
   const avatar = ctx.file;
@@ -295,7 +306,7 @@ router.post('/users/:id', upload.single('avatar'), async (ctx) => {
   user.name = name;
   await userService.updateUser(user);
 
-  await ctx.Inertia('Users/Show', { user });
+  await ctx.Inertia("Users/Show", { user });
 });
 
 app.use(router.routes());
