@@ -37,6 +37,30 @@ app.use(
 ```
 
 ```ts
+// framework: nestjs
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { inertiaNestJSAdapter } from '@inertianode/nestjs';
+
+@Module({
+  // ... your module configuration
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        inertiaNestJSAdapter({
+          ssr: {
+            enabled: true,
+            url: 'http://127.0.0.1:13714/render', // default
+          },
+        })
+      )
+      .forRoutes('*');
+  }
+}
+```
+
+```ts
 // framework: koa
 import { inertiaKoaAdapter } from "@inertianode/koa";
 

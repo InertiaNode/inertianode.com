@@ -35,6 +35,25 @@ app.get('/posts', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { merge } from '@inertianode/express';
+
+@Controller()
+export class PostsController {
+  @Get('/posts')
+  async index(@Req() req: Request, @Res() res: Response) {
+    const posts = await postService.getPaginated();
+
+    await res.Inertia.render('Posts/Index', {
+      posts: merge(posts)
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import { merge } from '@inertianode/koa';
 
@@ -70,6 +89,23 @@ await res.Inertia('Dashboard', {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { deepMerge } from '@inertianode/express';
+
+@Controller()
+export class DashboardController {
+  @Get('/dashboard')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard', {
+      analytics: deepMerge(analyticsData)
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import { deepMerge } from '@inertianode/koa';
 
@@ -102,6 +138,23 @@ await res.Inertia('Posts/Index', {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { merge } from '@inertianode/express';
+
+@Controller()
+export class PostsController {
+  @Get('/posts')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Posts/Index', {
+      posts: merge(posts).prepend()
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import { merge } from '@inertianode/koa';
 
@@ -131,6 +184,23 @@ import { merge } from '@inertianode/express';
 await res.Inertia('Users/Index', {
   users: merge(users).matchOn('id')
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { merge } from '@inertianode/express';
+
+@Controller()
+export class UsersController {
+  @Get('/users')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: merge(users).matchOn('id')
+    });
+  }
+}
 ```
 
 ```ts

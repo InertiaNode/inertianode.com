@@ -35,6 +35,23 @@ app.get("/users", async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { scroll } from '@inertianode/express';
+
+@Controller()
+export class UsersController {
+  @Get('/users')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: scroll(() => userService.getPaginated()),
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 import Router from "@koa/router";
@@ -888,6 +905,24 @@ app.get("/dashboard", async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { scroll } from '@inertianode/express';
+
+@Controller()
+export class DashboardController {
+  @Get('/dashboard')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard', {
+      users: scroll(() => userService.getPaginated({ pageName: "users" })),
+      orders: scroll(() => orderService.getPaginated({ pageName: "orders" })),
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 import Router from "@koa/router";
@@ -999,6 +1034,16 @@ scroll(() => userService.getCursorPaginated(20));
 ```
 
 ```ts
+// framework: nestjs
+import { scroll } from "@inertianode/express";
+
+// Works with various pagination methods...
+scroll(() => userService.getPaginated(20));
+scroll(() => userService.getSimplePaginated(20));
+scroll(() => userService.getCursorPaginated(20));
+```
+
+```ts
 // framework: koa
 import { scroll } from "@inertianode/koa";
 
@@ -1022,6 +1067,16 @@ scroll(data, { metadata: metadataProvider });
 
 ```ts
 // framework: express
+import { scroll } from "@inertianode/express";
+
+// Customize the data wrapper key (defaults to 'data')...
+scroll(customPaginatedData, { wrapper: "items" });
+// Provide custom metadata resolution...
+scroll(data, { metadata: metadataProvider });
+```
+
+```ts
+// framework: nestjs
 import { scroll } from "@inertianode/express";
 
 // Customize the data wrapper key (defaults to 'data')...
@@ -1098,6 +1153,19 @@ scroll(() => transformData(data), {
 ```
 
 ```ts
+// framework: nestjs
+import { scroll } from "@inertianode/express";
+
+// Using an instance directly
+scroll(data, { metadata: new CustomScrollMetadata(data) });
+
+// Using a callback
+scroll(() => transformData(data), {
+  metadata: (d) => new CustomScrollMetadata(d),
+});
+```
+
+```ts
 // framework: koa
 import { scroll } from "@inertianode/koa";
 
@@ -1152,6 +1220,31 @@ app.get("/users", async (req, res) => {
     users: customScroll(userService.getCustomPaginated()),
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { scroll } from '@inertianode/express';
+
+// Helper function
+function customScroll(data: PaginatedCollection) {
+  return scroll(data, {
+    metadata: (d) => new CustomScrollMetadata(d),
+  });
+}
+
+// Then use it in your routes
+@Controller()
+export class UsersController {
+  @Get('/users')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: customScroll(userService.getCustomPaginated()),
+    });
+  }
+}
 ```
 
 ```ts

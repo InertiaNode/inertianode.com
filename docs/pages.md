@@ -94,6 +94,24 @@ app.get("/users/:id", async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Get(':id')
+  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    const user = await userService.getUser(id);
+
+    await res.Inertia.render('User/Show', {
+      user,
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 router.get("/users/:id", async (ctx) => {
   const user = await userService.getUser(ctx.params.id);

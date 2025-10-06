@@ -48,6 +48,29 @@ app.get('/events/:id', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class EventsController {
+  @Get('/events/:id')
+  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    const eventItem = await eventService.getEvent(id);
+
+    await res.Inertia.render('Event/Show', {
+      event: {
+        id: eventItem.id,
+        title: eventItem.title,
+        startDate: eventItem.startDate,
+        description: eventItem.description
+      }
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';
@@ -126,6 +149,36 @@ app.get('/dashboard', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class DashboardController {
+  @Get('/dashboard')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard', {
+      // Primitive values
+      title: 'Dashboard',
+      count: 42,
+      active: true,
+      // Objects and arrays
+      settings: { theme: 'dark', notifications: true },
+      // Database models
+      user: await userService.getCurrentUser(),
+      users: await userService.getAllUsers(),
+      // DTOs and custom objects
+      profile: new UserProfileDto(await userService.getCurrentUser()),
+      // Plain objects
+      data: { key: 'value' },
+      // Computed properties using functions
+      timestamp: () => Math.floor(Date.now() / 1000)
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 router.get('/dashboard', async (ctx) => {
   await ctx.Inertia('Dashboard', {
@@ -187,6 +240,25 @@ app.get('/profile', async (req, res) => {
     avatar: new UserAvatar(user, 128)
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class ProfileController {
+  @Get('/profile')
+  async show(@Req() req: Request, @Res() res: Response) {
+    const user = await userService.getCurrentUser();
+
+    await res.Inertia.render('Profile', {
+      user: user,
+      avatar: new UserAvatar(user, 128)
+    });
+  }
+}
 ```
 
 You can also create patterns for merging with shared data:
@@ -258,6 +330,25 @@ app.get('/profile', async (req, res) => {
 });
 ```
 
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class ProfileController {
+  @Get('profile')
+  async show(@Req() req: Request, @Res() res: Response) {
+    const user = await userService.getCurrentUser();
+    const permissions = new UserPermissions(user);
+
+    await res.Inertia.render('UserProfile', {
+      permissions: await permissions.toJSON()
+    });
+  }
+}
+```
+
 You can also combine multiple prop objects with other props:
 
 ```ts
@@ -271,6 +362,26 @@ app.get('/profile', async (req, res) => {
     permissions: await permissions.toJSON()
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class ProfileController {
+  @Get('profile')
+  async show(@Req() req: Request, @Res() res: Response) {
+    const user = await userService.getCurrentUser();
+    const permissions = new UserPermissions(user);
+
+    await res.Inertia.render('UserProfile', {
+      user: user,
+      permissions: await permissions.toJSON()
+    });
+  }
+}
 ```
 
 ## Root template data

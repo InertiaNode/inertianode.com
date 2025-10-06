@@ -65,6 +65,7 @@
             "hono",
             "express",
             "koa",
+            "nestjs",
           ],
           defaultFramework: "react",
           frameworkNames: {
@@ -76,11 +77,12 @@
             express: "Express",
             hono: "Hono",
             koa: "Koa",
+            nestjs: "NestJS",
           },
           markerPattern:
-            /^\s*(?:\/\/\s*|#\s*|<!--\s*)?framework:\s*(express|hono|koa|react|vue|svelte[45]?|vuex)(?:\s*-->)?/i,
+            /^\s*(?:\/\/\s*|#\s*|<!--\s*)?framework:\s*(express|hono|koa|nestjs|react|vue|svelte[45]?|vuex)(?:\s*-->)?/i,
           labelPattern:
-            /^(Express|Hono|Koa|React|Vue|Svelte(?:\s*[45])?):?\s*$/i,
+            /^(Express|Hono|Koa|NestJS|React|Vue|Svelte(?:\s*[45])?):?\s*$/i,
         },
         copyCode: {
           buttonText: "📋",

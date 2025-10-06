@@ -48,6 +48,35 @@ app.use(express.json());
 // Your routes...
 ```
 
+```ts
+// framework: nestjs
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import * as session from 'express-session';
+import { inertiaExpressAdapter } from '@inertianode/express';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Session middleware
+  app.use(session({
+    name: 'app.session',
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 1800000 // 30 minutes
+    }
+  }));
+
+  // Inertia middleware
+  app.use(inertiaExpressAdapter());
+
+  await app.listen(3000);
+}
+bootstrap();
+```
 
 ```ts
 // framework: koa
@@ -136,6 +165,45 @@ app.use((req, res, next) => {
 });
 ```
 
+```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class InertiaSharedDataMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    // Share flash messages
+    res.Inertia.share('flash', () => {
+      const flash = (req as any).session.flash || {};
+      delete (req as any).session.flash; // Clear flash after reading
+      return flash;
+    });
+
+    // Share authentication data
+    res.Inertia.share('auth', () => {
+      if ((req as any).user) {
+        return {
+          user: {
+            id: (req as any).user.id,
+            first_name: (req as any).user.firstName,
+            last_name: (req as any).user.lastName,
+            email: (req as any).user.email,
+            owner: (req as any).user.owner,
+            account: {
+              id: (req as any).user.accountId,
+              name: (req as any).user.account?.name
+            }
+          }
+        };
+      }
+      return { user: null };
+    });
+
+    next();
+  }
+}
+```
 
 ```ts
 // framework: koa
@@ -245,6 +313,40 @@ app.use((err, req, res, next) => {
     stackTrace: process.env.NODE_ENV === 'development' ? err.stack : null
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Catch()
+export class InertiaExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+
+    const status = exception instanceof HttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    console.error(exception);
+
+    if (status === HttpStatus.NOT_FOUND) {
+      response.status(404);
+      return request.Inertia.render('Error/NotFound');
+    }
+
+    response.status(status);
+    return request.Inertia.render('Error/ServerError', {
+      message: process.env.NODE_ENV === 'development'
+        ? (exception as Error).message
+        : 'An unexpected error occurred. Please try again later.',
+      stackTrace: process.env.NODE_ENV === 'development' ? (exception as Error).stack : null
+    });
+  }
+}
 ```
 
 ```ts

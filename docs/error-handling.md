@@ -64,6 +64,40 @@ app.use(async (err, req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Catch()
+export class InertiaExceptionFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    if (isDevelopment) {
+      // Re-throw in development for detailed error display
+      throw exception;
+    }
+
+    const statusCode = exception instanceof HttpException
+      ? exception.getStatus()
+      : 500;
+
+    response.status(statusCode);
+    (request as any).Inertia.render('ErrorPage', {
+      status: statusCode,
+    });
+  }
+}
+
+// Register in main.ts:
+// app.useGlobalFilters(new InertiaExceptionFilter());
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 

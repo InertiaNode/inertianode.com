@@ -1,8 +1,8 @@
 # Server-side setup
 
-The first step when installing Inertia is to configure your server-side framework. InertiaNode provides server-side adapters for [Hono](https://hono.dev/), [Express](https://expressjs.com/), and [Koa](https://koajs.com/). For other frameworks, please see the [community adapters](https://inertiajs.com/community-adapters).
+The first step when installing Inertia is to configure your server-side framework. InertiaNode provides server-side adapters for [Hono](https://hono.dev/), [Express](https://expressjs.com/), [NestJS](https://nestjs.com/), and [Koa](https://koajs.com/). For other frameworks, please see the [community adapters](https://inertiajs.com/community-adapters).
 
-The documentation examples on this website utilize Hono, Express, and Koa. For examples of using Inertia with other server-side frameworks, please refer to the framework specific documentation maintained by that adapter.
+The documentation examples on this website utilize Hono, Express, NestJS, and Koa. For examples of using Inertia with other server-side frameworks, please refer to the framework specific documentation maintained by that adapter.
 
 ## Project templates
 
@@ -20,6 +20,9 @@ npm install @inertianode/hono @inertianode/core hono
 
 # Express
 npm install @inertianode/express @inertianode/core express
+
+# NestJS
+npm install @inertianode/nestjs @inertianode/core @nestjs/common @nestjs/core @nestjs/platform-express
 
 # Koa
 npm install @inertianode/koa @inertianode/core koa @koa/router
@@ -130,6 +133,47 @@ app.listen(3000, () => {
 ```
 
 ```ts
+// framework: nestjs
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { inertiaNestJSAdapter } from '@inertianode/nestjs';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { rootTemplate } from './templates/root';
+import { join } from 'path';
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
+  controllers: [AppController],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        inertiaNestJSAdapter({
+          html: (page) => rootTemplate(page),
+          vite: {
+            reactRefresh: true, // Enable React Fast Refresh (for React apps)
+          }
+        })
+      )
+      .forRoutes('*');
+  }
+}
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+  console.log('Server running on port 3000');
+}
+
+bootstrap();
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';
@@ -205,6 +249,30 @@ app.get('/events/:id', async (req, res) => {
     }
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('events')
+export class EventsController {
+  @Get(':id')
+  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    const eventItem = await db.events.find(id);
+
+    // Using the render method
+    await res.Inertia.render('Event/Show', {
+      event: {
+        id: eventItem.id,
+        title: eventItem.title,
+        startDate: eventItem.startDate,
+        description: eventItem.description
+      }
+    });
+  }
+}
 ```
 
 ```ts

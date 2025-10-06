@@ -59,6 +59,32 @@ app.use(
 ```
 
 ```ts
+// framework: nestjs
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { inertiaExpressAdapter } from '@inertianode/express';
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.use(
+    inertiaExpressAdapter({
+      vite: {
+        publicDirectory: "public",
+        buildDirectory: "build",
+        hotFile: "hot",
+        manifestFilename: "manifest.json",
+        reactRefresh: true, // Enable React Fast Refresh
+      },
+    })
+  );
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+```ts
 // framework: koa
 import { inertiaKoaAdapter, Inertia } from "@inertianode/koa";
 

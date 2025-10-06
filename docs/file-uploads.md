@@ -237,6 +237,39 @@ app.post('/users/:id', upload.single('avatar'), async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Post, Param, Body, UploadedFile, UseInterceptors, Req, Res } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Post(':id')
+  @UseInterceptors(FileInterceptor('avatar', { dest: 'uploads/' }))
+  async update(
+    @Param('id') id: string,
+    @Body('name') name: string,
+    @UploadedFile() avatar: Express.Multer.File,
+    @Req() req: Request,
+    @Res() res: Response
+  ) {
+    const user = await userService.getUser(id);
+
+    if (avatar) {
+      // Handle file upload
+      const fileName = await fileService.saveFile(avatar);
+      user.avatarPath = fileName;
+    }
+
+    user.name = name;
+    await userService.updateUser(user);
+
+    await res.Inertia.render('Users/Show', { user });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';

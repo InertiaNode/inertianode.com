@@ -74,6 +74,43 @@ app.get('/users', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Get()
+  async index(@Req() req: Request, @Res() res: Response) {
+    const currentUser = req.user; // Assumes auth middleware sets user
+    const canCreateUser = await authService.can(currentUser, 'createUser');
+    const users = await userService.getAllUsers();
+
+    const userViewModels = await Promise.all(
+      users.map(async (user) => {
+        const canEditUser = await authService.can(currentUser, 'editUser', user);
+        return {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          can: {
+            editUser: canEditUser
+          }
+        };
+      })
+    );
+
+    await res.Inertia.render('Users/Index', {
+      can: {
+        createUser: canCreateUser
+      },
+      users: userViewModels
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';

@@ -143,6 +143,23 @@ app.get('/users', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Get()
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: () => userService.getAll(),
+      companies: () => companyService.getAll()
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';
@@ -185,6 +202,15 @@ await res.Inertia('Users/Index', {
 ```
 
 ```ts
+// framework: nestjs
+import { optional } from '@inertianode/nestjs';
+
+await res.Inertia.render('Users/Index', {
+  users: optional(() => userService.getAll())
+});
+```
+
+```ts
 // framework: koa
 import { optional } from '@inertianode/koa';
 
@@ -209,6 +235,15 @@ return await c.Inertia('Users/Index', {
 import { always } from '@inertianode/express';
 
 await res.Inertia('Users/Index', {
+  users: always(userService.getAll())
+});
+```
+
+```ts
+// framework: nestjs
+import { always } from '@inertianode/nestjs';
+
+await res.Inertia.render('Users/Index', {
   users: always(userService.getAll())
 });
 ```
@@ -252,6 +287,31 @@ return await c.Inertia('Users/Index', {
 ```ts
 // framework: express
 await res.Inertia('Users/Index', {
+  // ALWAYS included on standard visits
+  // OPTIONALLY included on partial reloads
+  // ALWAYS evaluated
+  users: userService.getAll(),
+
+  // ALWAYS included on standard visits
+  // OPTIONALLY included on partial reloads
+  // ONLY evaluated when needed
+  users: () => userService.getAll(),
+
+  // NEVER included on standard visits
+  // OPTIONALLY included on partial reloads
+  // ONLY evaluated when needed
+  users: optional(() => userService.getAll()),
+
+  // ALWAYS included on standard visits
+  // ALWAYS included on partial reloads
+  // ALWAYS evaluated
+  users: always(userService.getAll())
+});
+```
+
+```ts
+// framework: nestjs
+await res.Inertia.render('Users/Index', {
   // ALWAYS included on standard visits
   // OPTIONALLY included on partial reloads
   // ALWAYS evaluated

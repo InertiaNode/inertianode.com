@@ -39,6 +39,25 @@ app.get("/faq", async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class PagesController {
+  @Get('/about')
+  async about(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('About');
+  }
+
+  @Get('/faq')
+  async faq(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('FAQ');
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 import Router from "@koa/router";
@@ -97,6 +116,29 @@ app.use((req, res, next) => {
   });
   next();
 });
+```
+
+```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import { Inertia } from '@inertianode/core';
+
+@Injectable()
+export class ResolveUrlMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    Inertia.resolveUrlUsing(() => {
+      return (
+        req.path +
+        (req.query && Object.keys(req.query).length
+          ? '?' +
+            new URLSearchParams(req.query as Record<string, string>).toString()
+          : '')
+      );
+    });
+    next();
+  }
+}
 ```
 
 ```ts

@@ -38,6 +38,27 @@ app.use(inertiaExpressAdapter({
 ```
 
 ```ts
+// framework: nestjs
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { inertiaNestJSAdapter } from '@inertianode/nestjs';
+
+@Module({
+  // ...
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        inertiaNestJSAdapter({
+          version: () => '1234567890'
+        })
+      )
+      .forRoutes('*');
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 import { inertiaKoaAdapter } from "@inertianode/koa";
@@ -103,6 +124,23 @@ app.use((req, res, next) => {
   res.Inertia.share("version", () => "1234567890");
   next();
 });
+```
+
+```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class ShareVersionMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    res.Inertia.share('version', () => '1234567890');
+    next();
+  }
+}
+
+// Register in AppModule:
+// consumer.apply(ShareVersionMiddleware).forRoutes('*');
 ```
 
 ```ts

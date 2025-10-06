@@ -32,6 +32,46 @@ app.post('/users', csrfProtection, async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Module, NestModule, MiddlewareConsumer, Injectable, NestMiddleware, Controller, Post, Res } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import * as csurf from 'csurf';
+import * as cookieParser from 'cookie-parser';
+
+const csrfProtection = csurf({ cookie: true });
+
+@Injectable()
+export class CsrfMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    if (req.csrfToken) {
+      res.Inertia.share('csrf_token', req.csrfToken());
+    }
+    next();
+  }
+}
+
+@Module({
+  // ...
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(cookieParser(), csrfProtection, CsrfMiddleware)
+      .forRoutes('*');
+  }
+}
+
+@Controller('users')
+export class UsersController {
+  @Post()
+  async store(@Res() res: Response) {
+    // Create user...
+    res.redirect('/users');
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import csrf from 'koa-csrf';
@@ -156,6 +196,32 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+```
+
+```ts
+// framework: nestjs
+import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Catch()
+export class CsrfExceptionFilter implements ExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+
+    if (exception.code === 'EBADCSRFTOKEN') {
+      // CSRF token mismatch - redirect back with error
+      request.Inertia.share('error', 'The page expired, please try again.');
+      return request.Inertia.back();
+    }
+
+    throw exception;
+  }
+}
+
+// Register in main.ts:
+// app.useGlobalFilters(new CsrfExceptionFilter());
 ```
 
 ```ts

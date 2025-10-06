@@ -185,6 +185,115 @@ app.get("/dashboard", (req, res) => {
 });
 ```
 
+### NestJS
+
+NestJS provides a flexible authentication system through Guards and middleware. Here's an example using `@nestjs/passport` and session-based auth:
+
+```ts
+// framework: nestjs
+import { Module, Injectable, CanActivate, ExecutionContext, Controller, Get, Post, Body, Req, Res, UseGuards, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import * as session from 'express-session';
+import * as passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+
+// Passport local strategy
+@Injectable()
+export class LocalAuthStrategy extends LocalStrategy {
+  constructor() {
+    super({
+      usernameField: 'email',
+      passwordField: 'password',
+    });
+  }
+
+  async validate(email: string, password: string): Promise<any> {
+    const user = await validateCredentials(email, password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return user;
+  }
+}
+
+// Authentication guard
+@Injectable()
+export class AuthGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    return request.isAuthenticated();
+  }
+}
+
+// Middleware to share auth data with Inertia
+@Injectable()
+export class ShareAuthMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    res.Inertia.share('auth', {
+      user: req.user || null,
+    });
+    next();
+  }
+}
+
+// Auth controller
+@Controller()
+export class AuthController {
+  @Post('/login')
+  @UseGuards(passport.authenticate('local'))
+  async login(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.back();
+  }
+
+  @Post('/logout')
+  async logout(@Req() req: Request, @Res() res: Response) {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+      res.redirect('/');
+    });
+  }
+
+  @Get('/dashboard')
+  @UseGuards(AuthGuard)
+  async dashboard(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard', {
+      user: req.user,
+    });
+  }
+}
+
+// App module configuration
+@Module({
+  imports: [],
+  controllers: [AuthController],
+  providers: [LocalAuthStrategy, AuthGuard, ShareAuthMiddleware],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Session configuration
+    consumer
+      .apply(
+        session({
+          secret: process.env.SESSION_SECRET!,
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+          },
+        }),
+        passport.initialize(),
+        passport.session(),
+        ShareAuthMiddleware
+      )
+      .forRoutes('*');
+  }
+}
+```
+
 ### Koa
 
 Koa provides session support through middleware. Here's an example using `koa-session`:
@@ -296,6 +405,22 @@ app.use((req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class ShareAuthMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    res.Inertia.share('auth', {
+      user: req.user || null,
+    });
+    next();
+  }
+}
+```
+
+```ts
 // framework: koa
 app.use(async (ctx, next) => {
   ctx.Inertia.share("auth", {
@@ -399,6 +524,21 @@ app.get("/dashboard", (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class AppController {
+  @Get('/dashboard')
+  @UseGuards(AuthGuard)
+  async dashboard(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard');
+  }
+}
+```
+
+```ts
 // framework: koa
 app.use(async (ctx, next) => {
   if (ctx.path === "/dashboard") {
@@ -443,6 +583,34 @@ const requireAuth = (req, res, next) => {
 app.get("/dashboard", requireAuth, (req, res) => {
   res.Inertia.render("Dashboard");
 });
+```
+
+```ts
+// framework: nestjs
+import { Injectable, CanActivate, ExecutionContext, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    if (!request.isAuthenticated()) {
+      const response = context.switchToHttp().getResponse();
+      response.redirect('/login');
+      return false;
+    }
+    return true;
+  }
+}
+
+@Controller()
+export class AppController {
+  @Get('/dashboard')
+  @UseGuards(AuthGuard)
+  async dashboard(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Dashboard');
+  }
+}
 ```
 
 ```ts
@@ -555,6 +723,53 @@ app.get(
     res.redirect("/dashboard");
   }
 );
+```
+
+### NestJS with Passport OAuth
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res, UseGuards, Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { AuthGuard } from '@nestjs/passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Request, Response } from 'express';
+
+@Injectable()
+export class GoogleAuthStrategy extends PassportStrategy(GoogleStrategy, 'google') {
+  constructor() {
+    super({
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: `${process.env.APP_URL}/auth/google/callback`,
+      scope: ['profile', 'email'],
+    });
+  }
+
+  async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
+    const user = await findOrCreateUser({
+      email: profile.emails?.[0].value,
+      name: profile.displayName,
+      provider: 'google',
+    });
+    return user;
+  }
+}
+
+@Controller('auth')
+export class AuthController {
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Initiates the Google OAuth2 flow
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    res.redirect('/dashboard');
+  }
+}
 ```
 
 ### Koa with OAuth

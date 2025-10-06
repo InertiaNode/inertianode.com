@@ -35,6 +35,20 @@ app.use((req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class EncryptHistoryMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    res.Inertia.encryptHistory();
+    next();
+  }
+}
+```
+
+```ts
 // framework: koa
 app.use(async (ctx, next) => {
   ctx.Inertia.encryptHistory();
@@ -60,6 +74,22 @@ app.get("/page", async (req, res) => {
 
   await res.Inertia("Page", {});
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class PageController {
+  @Get('/page')
+  async show(@Req() req: Request, @Res() res: Response) {
+    res.Inertia.encryptHistory(false);
+
+    await res.Inertia.render('Page', {});
+  }
+}
 ```
 
 ```ts
@@ -91,6 +121,22 @@ app.post("/secure-action", async (req, res) => {
 
   await res.Inertia("SecurePage", {});
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class SecureController {
+  @Post('/secure-action')
+  async secureAction(@Req() req: Request, @Res() res: Response) {
+    res.Inertia.encryptHistory();
+
+    await res.Inertia.render('SecurePage', {});
+  }
+}
 ```
 
 ```ts
@@ -131,6 +177,20 @@ app.use((req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class EncryptHistoryConfigMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    res.Inertia.encryptHistory(false);
+    next();
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from "koa";
 
@@ -162,6 +222,22 @@ app.post("/logout", async (req, res) => {
 
   await res.Inertia("Login", {});
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class AuthController {
+  @Post('/logout')
+  async logout(@Req() req: Request, @Res() res: Response) {
+    res.Inertia.clearHistory();
+
+    await res.Inertia.render('Login', {});
+  }
+}
 ```
 
 ```ts

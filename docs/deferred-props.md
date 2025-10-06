@@ -39,6 +39,25 @@ app.get('/users', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { defer } from '@inertianode/nestjs';
+
+@Controller('users')
+export class UsersController {
+  @Get()
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: userService.getAll(),
+      roles: roleService.getAll(),
+      permissions: defer(() => permissionService.getAll())
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';
@@ -98,6 +117,28 @@ app.get('/users', async (req, res) => {
     tasks: defer(() => taskService.getAll(), 'attributes')
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { defer } from '@inertianode/nestjs';
+
+@Controller('users')
+export class UsersController {
+  @Get()
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Users/Index', {
+      users: userService.getAll(),
+      roles: roleService.getAll(),
+      permissions: defer(() => permissionService.getAll()),
+      teams: defer(() => teamService.getAll(), 'attributes'),
+      projects: defer(() => projectService.getAll(), 'attributes'),
+      tasks: defer(() => taskService.getAll(), 'attributes')
+    });
+  }
+}
 ```
 
 ```ts

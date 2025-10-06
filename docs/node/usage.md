@@ -31,6 +31,24 @@ app.get('/posts', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class PostsController {
+  @Get('/posts')
+  async index(@Req() req: Request, @Res() res: Response) {
+    const posts = await db.posts.findMany();
+
+    await res.Inertia.render('Posts', {
+      posts
+    });
+  }
+}
+```
+
+```ts
 // framework: koa
 router.get('/posts', async (ctx) => {
   const posts = await db.posts.findMany();
@@ -79,6 +97,30 @@ app.post('/posts', async (req, res) => {
   await db.posts.create(post);
   res.redirect('/posts');
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Post, Req, Res, Body } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class PostsController {
+  @Post('/posts')
+  async create(@Body() post: any, @Req() req: Request, @Res() res: Response) {
+    // Validation errors are passed automatically
+    const errors = validatePost(post);
+    if (errors) {
+      return await res.Inertia.render('Posts/Create', {
+        errors,
+        post
+      });
+    }
+
+    await db.posts.create(post);
+    res.redirect('/posts');
+  }
+}
 ```
 
 ```ts
@@ -147,6 +189,32 @@ app.use((req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class InertiaSharedDataMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    const userId = (req as any).session.userId;
+
+    res.Inertia.share('auth', {
+      userId
+    });
+
+    // Or using an object
+    res.Inertia.share({
+      auth: {
+        userId
+      }
+    });
+
+    next();
+  }
+}
+```
+
+```ts
 // framework: koa
 app.use(async (ctx, next) => {
   const userId = ctx.session.userId;
@@ -186,6 +254,22 @@ app.get('/posts', async (req, res) => {
     posts: async () => await db.posts.findMany()
   });
 });
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class PostsController {
+  @Get('/posts')
+  async index(@Req() req: Request, @Res() res: Response) {
+    await res.Inertia.render('Posts', {
+      posts: async () => await db.posts.findMany()
+    });
+  }
+}
 ```
 
 ```ts

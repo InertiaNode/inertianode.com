@@ -62,6 +62,38 @@ app.post('/users', async (req, res) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Get()
+  async index(@Req() req: Request, @Res() res: Response) {
+    const users = await userService.getAllUsers();
+    await res.Inertia.render('Users/Index', {
+      users
+    });
+  }
+
+  @Post()
+  async store(@Body() body: { name: string; email: string }, @Req() req: Request, @Res() res: Response) {
+    const { name, email } = body;
+
+    // Validate request
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Invalid request' });
+    }
+
+    await userService.createUser({ name, email });
+
+    // Redirect back to previous page
+    res.Inertia.back('/users');
+  }
+}
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 import Router from '@koa/router';
@@ -114,6 +146,25 @@ res.Inertia.back('/users');
 ```
 
 ```ts
+// framework: nestjs
+import { Controller, Put, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller('users')
+export class UsersController {
+  @Put(':id')
+  async update(@Req() req: Request, @Res() res: Response) {
+    // Update user logic...
+
+    // Use 303 status for redirect after PUT/PATCH/DELETE
+    res.redirect(303, '/users');
+    // Or use back() which handles it automatically
+    res.Inertia.back('/users');
+  }
+}
+```
+
+```ts
 // framework: koa
 ctx.status = 303;
 ctx.redirect('/users');
@@ -135,6 +186,20 @@ app.get('/external-redirect', async (c) => {
 ```ts
 // framework: express
 return res.Inertia.location('https://example.com');
+```
+
+```ts
+// framework: nestjs
+import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+@Controller()
+export class AppController {
+  @Get('/external-redirect')
+  async externalRedirect(@Req() req: Request, @Res() res: Response) {
+    return res.Inertia.location('https://example.com');
+  }
+}
 ```
 
 ```ts

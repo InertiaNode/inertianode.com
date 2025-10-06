@@ -59,6 +59,37 @@ app.use((req, res, next) => {
 ```
 
 ```ts
+// framework: nestjs
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class ShareDataMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    // Use the request-specific Inertia instance
+    // Synchronously...
+    res.Inertia.share('appName', process.env.APP_NAME);
+
+    // Lazily...
+    res.Inertia.share('auth', () => {
+      return req.user ? {
+        user: {
+          id: req.user.id,
+          name: req.user.name,
+          email: req.user.email
+        }
+      } : null;
+    });
+
+    next();
+  }
+}
+
+// Register in AppModule:
+// consumer.apply(ShareDataMiddleware).forRoutes('*');
+```
+
+```ts
 // framework: koa
 import Koa from 'koa';
 
@@ -204,6 +235,51 @@ app.post('/users', async (req, res) => {
   req.session.flash = { message: 'User created successfully!' };
   res.redirect('/users');
 });
+```
+
+```ts
+// framework: nestjs
+import { Module, NestModule, MiddlewareConsumer, Injectable, NestMiddleware, Controller, Post, Req, Res } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import * as session from 'express-session';
+
+@Injectable()
+export class FlashMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    // Use request-specific Inertia instance
+    res.Inertia.share('flash', () => {
+      const flash = (req.session as any).flash || {};
+      delete (req.session as any).flash; // Clear flash after reading
+      return flash;
+    });
+
+    next();
+  }
+}
+
+@Module({
+  // ...
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        session({ secret: 'your-secret', resave: false, saveUninitialized: false }),
+        FlashMiddleware
+      )
+      .forRoutes('*');
+  }
+}
+
+@Controller('users')
+export class UsersController {
+  @Post()
+  async store(@Req() req: Request, @Res() res: Response) {
+    // Create user...
+    (req.session as any).flash = { message: 'User created successfully!' };
+    res.redirect('/users');
+  }
+}
 ```
 
 ```ts
