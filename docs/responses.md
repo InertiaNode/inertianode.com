@@ -8,63 +8,63 @@ In the example below, we will pass a single property (`event`) which contains fo
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get('/events/:id', async (c) => {
-  const id = c.req.param('id');
+app.get("/events/:id", async (c) => {
+  const id = c.req.param("id");
   const eventItem = await eventService.getEvent(id);
 
-  return await c.Inertia('Event/Show', {
+  return await c.Inertia("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
+import express from "express";
 
 const app = express();
 
-app.get('/events/:id', async (req, res) => {
+app.get("/events/:id", async (req, res) => {
   const eventItem = await eventService.getEvent(req.params.id);
 
-  await res.Inertia('Event/Show', {
+  await res.Inertia("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Param } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class EventsController {
-  @Get('/events/:id')
-  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+  @Get("/events/:id")
+  async show(@Param("id") id: string, @Inert() inertia: Inertia) {
     const eventItem = await eventService.getEvent(id);
 
-    await res.Inertia.render('Event/Show', {
+    await inertia("Event/Show", {
       event: {
         id: eventItem.id,
         title: eventItem.title,
         startDate: eventItem.startDate,
-        description: eventItem.description
-      }
+        description: eventItem.description,
+      },
     });
   }
 }
@@ -72,22 +72,22 @@ export class EventsController {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
+import Koa from "koa";
+import Router from "@koa/router";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/events/:id', async (ctx) => {
+router.get("/events/:id", async (ctx) => {
   const eventItem = await eventService.getEvent(ctx.params.id);
 
-  await ctx.Inertia('Event/Show', {
+  await ctx.Inertia("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 
@@ -104,75 +104,75 @@ To pass data from the server to your page components, you can use properties. Yo
 
 ```ts
 // framework: hono
-app.get('/dashboard', async (c) => {
-  return await c.Inertia('Dashboard', {
+app.get("/dashboard", async (c) => {
+  return await c.Inertia("Dashboard", {
     // Primitive values
-    title: 'Dashboard',
+    title: "Dashboard",
     count: 42,
     active: true,
     // Objects and arrays
-    settings: { theme: 'dark', notifications: true },
+    settings: { theme: "dark", notifications: true },
     // Database models
     user: await userService.getCurrentUser(),
     users: await userService.getAllUsers(),
     // DTOs and custom objects
     profile: new UserProfileDto(await userService.getCurrentUser()),
     // Plain objects
-    data: { key: 'value' },
+    data: { key: "value" },
     // Computed properties using functions
-    timestamp: () => Math.floor(Date.now() / 1000)
+    timestamp: () => Math.floor(Date.now() / 1000),
   });
 });
 ```
 
 ```ts
 // framework: express
-app.get('/dashboard', async (req, res) => {
-  await res.Inertia('Dashboard', {
+app.get("/dashboard", async (req, res) => {
+  await res.Inertia("Dashboard", {
     // Primitive values
-    title: 'Dashboard',
+    title: "Dashboard",
     count: 42,
     active: true,
     // Objects and arrays
-    settings: { theme: 'dark', notifications: true },
+    settings: { theme: "dark", notifications: true },
     // Database models
     user: await userService.getCurrentUser(),
     users: await userService.getAllUsers(),
     // DTOs and custom objects
     profile: new UserProfileDto(await userService.getCurrentUser()),
     // Plain objects
-    data: { key: 'value' },
+    data: { key: "value" },
     // Computed properties using functions
-    timestamp: () => Math.floor(Date.now() / 1000)
+    timestamp: () => Math.floor(Date.now() / 1000),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class DashboardController {
-  @Get('/dashboard')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard', {
+  @Get("/dashboard")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Dashboard", {
       // Primitive values
-      title: 'Dashboard',
+      title: "Dashboard",
       count: 42,
       active: true,
       // Objects and arrays
-      settings: { theme: 'dark', notifications: true },
+      settings: { theme: "dark", notifications: true },
       // Database models
       user: await userService.getCurrentUser(),
       users: await userService.getAllUsers(),
       // DTOs and custom objects
       profile: new UserProfileDto(await userService.getCurrentUser()),
       // Plain objects
-      data: { key: 'value' },
+      data: { key: "value" },
       // Computed properties using functions
-      timestamp: () => Math.floor(Date.now() / 1000)
+      timestamp: () => Math.floor(Date.now() / 1000),
     });
   }
 }
@@ -180,23 +180,23 @@ export class DashboardController {
 
 ```ts
 // framework: koa
-router.get('/dashboard', async (ctx) => {
-  await ctx.Inertia('Dashboard', {
+router.get("/dashboard", async (ctx) => {
+  await ctx.Inertia("Dashboard", {
     // Primitive values
-    title: 'Dashboard',
+    title: "Dashboard",
     count: 42,
     active: true,
     // Objects and arrays
-    settings: { theme: 'dark', notifications: true },
+    settings: { theme: "dark", notifications: true },
     // Database models
     user: await userService.getCurrentUser(),
     users: await userService.getAllUsers(),
     // DTOs and custom objects
     profile: new UserProfileDto(await userService.getCurrentUser()),
     // Plain objects
-    data: { key: 'value' },
+    data: { key: "value" },
     // Computed properties using functions
-    timestamp: () => Math.floor(Date.now() / 1000)
+    timestamp: () => Math.floor(Date.now() / 1000),
   });
 });
 ```
@@ -244,16 +244,16 @@ app.get('/profile', async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
+import { Inert, type Inertia } from '@inertianode/nestjs';
 
 @Controller()
 export class ProfileController {
   @Get('/profile')
-  async show(@Req() req: Request, @Res() res: Response) {
+  async show(@Inert() inertia: Inertia) {
     const user = await userService.getCurrentUser();
 
-    await res.Inertia.render('Profile', {
+    await inertia('Profile', {
       user: user,
       avatar: new UserAvatar(user, 128)
     });
@@ -332,17 +332,17 @@ app.get('/profile', async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
+import { Inert, type Inertia } from '@inertianode/nestjs';
 
 @Controller()
 export class ProfileController {
   @Get('profile')
-  async show(@Req() req: Request, @Res() res: Response) {
+  async show(@Inert() inertia: Inertia) {
     const user = await userService.getCurrentUser();
     const permissions = new UserPermissions(user);
 
-    await res.Inertia.render('UserProfile', {
+    await inertia('UserProfile', {
       permissions: await permissions.toJSON()
     });
   }
@@ -366,17 +366,17 @@ app.get('/profile', async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
+import { Inert, type Inertia } from '@inertianode/nestjs';
 
 @Controller()
 export class ProfileController {
   @Get('profile')
-  async show(@Req() req: Request, @Res() res: Response) {
+  async show(@Inert() inertia: Inertia) {
     const user = await userService.getCurrentUser();
     const permissions = new UserPermissions(user);
 
-    await res.Inertia.render('UserProfile', {
+    await inertia('UserProfile', {
       user: user,
       permissions: await permissions.toJSON()
     });

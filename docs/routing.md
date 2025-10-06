@@ -40,19 +40,19 @@ app.get("/faq", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class PagesController {
-  @Get('/about')
-  async about(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('About');
+  @Get("/about")
+  async about(@Inert() inertia: Inertia) {
+    await inertia("About");
   }
 
-  @Get('/faq')
-  async faq(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('FAQ');
+  @Get("/faq")
+  async faq(@Inert() inertia: Inertia) {
+    await inertia("FAQ");
   }
 }
 ```
@@ -120,9 +120,9 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { Inertia } from '@inertianode/core';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+import { Inertia } from "@inertianode/core";
 
 @Injectable()
 export class ResolveUrlMiddleware implements NestMiddleware {
@@ -131,9 +131,9 @@ export class ResolveUrlMiddleware implements NestMiddleware {
       return (
         req.path +
         (req.query && Object.keys(req.query).length
-          ? '?' +
+          ? "?" +
             new URLSearchParams(req.query as Record<string, string>).toString()
-          : '')
+          : "")
       );
     });
     next();

@@ -36,8 +36,8 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
 
 @Injectable()
 export class EncryptHistoryMiddleware implements NestMiddleware {
@@ -78,16 +78,16 @@ app.get("/page", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class PageController {
-  @Get('/page')
-  async show(@Req() req: Request, @Res() res: Response) {
-    res.Inertia.encryptHistory(false);
+  @Get("/page")
+  async show(@Inert() inertia: Inertia) {
+    inertia.encryptHistory(false);
 
-    await res.Inertia.render('Page', {});
+    await inertia("Page", {});
   }
 }
 ```
@@ -125,16 +125,16 @@ app.post("/secure-action", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Post, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Post } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class SecureController {
-  @Post('/secure-action')
-  async secureAction(@Req() req: Request, @Res() res: Response) {
-    res.Inertia.encryptHistory();
+  @Post("/secure-action")
+  async secureAction(@Inert() inertia: Inertia) {
+    inertia.encryptHistory();
 
-    await res.Inertia.render('SecurePage', {});
+    await inertia("SecurePage", {});
   }
 }
 ```
@@ -178,8 +178,8 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
 
 @Injectable()
 export class EncryptHistoryConfigMiddleware implements NestMiddleware {
@@ -226,16 +226,16 @@ app.post("/logout", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Post, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Post } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class AuthController {
-  @Post('/logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    res.Inertia.clearHistory();
+  @Post("/logout")
+  async logout(@Inert() inertia: Inertia) {
+    inertia.clearHistory();
 
-    await res.Inertia.render('Login', {});
+    await inertia("Login", {});
   }
 }
 ```

@@ -95,16 +95,16 @@ app.get("/users/:id", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Param } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
-  @Get(':id')
-  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+  @Get(":id")
+  async show(@Param("id") id: string, @Inert() inertia: Inertia) {
     const user = await userService.getUser(id);
 
-    await res.Inertia.render('User/Show', {
+    await inertia("User/Show", {
       user,
     });
   }

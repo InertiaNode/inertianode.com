@@ -6,105 +6,109 @@ The simplest approach to solving this problem is to pass the results of your aut
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 // Hono uses per-request Inertia instance (c.Inertia);
 
 const app = new Hono();
 
-app.get('/users', async (c) => {
-  const currentUser = c.get('user'); // Assumes auth middleware sets user
-  const canCreateUser = await authService.can(currentUser, 'createUser');
+app.get("/users", async (c) => {
+  const currentUser = c.get("user"); // Assumes auth middleware sets user
+  const canCreateUser = await authService.can(currentUser, "createUser");
   const users = await userService.getAllUsers();
 
   const userViewModels = await Promise.all(
     users.map(async (user) => {
-      const canEditUser = await authService.can(currentUser, 'editUser', user);
+      const canEditUser = await authService.can(currentUser, "editUser", user);
       return {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         can: {
-          editUser: canEditUser
-        }
+          editUser: canEditUser,
+        },
       };
     })
   );
 
-  return await c.Inertia('Users/Index', {
+  return await c.Inertia("Users/Index", {
     can: {
-      createUser: canCreateUser
+      createUser: canCreateUser,
     },
-    users: userViewModels
+    users: userViewModels,
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
+import express from "express";
 
 const app = express();
 
-app.get('/users', async (req, res) => {
+app.get("/users", async (req, res) => {
   const currentUser = req.user; // Assumes auth middleware sets user
-  const canCreateUser = await authService.can(currentUser, 'createUser');
+  const canCreateUser = await authService.can(currentUser, "createUser");
   const users = await userService.getAllUsers();
 
   const userViewModels = await Promise.all(
     users.map(async (user) => {
-      const canEditUser = await authService.can(currentUser, 'editUser', user);
+      const canEditUser = await authService.can(currentUser, "editUser", user);
       return {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         can: {
-          editUser: canEditUser
-        }
+          editUser: canEditUser,
+        },
       };
     })
   );
 
-  await res.Inertia('Users/Index', {
+  await res.Inertia("Users/Index", {
     can: {
-      createUser: canCreateUser
+      createUser: canCreateUser,
     },
-    users: userViewModels
+    users: userViewModels,
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
-    const currentUser = req.user; // Assumes auth middleware sets user
-    const canCreateUser = await authService.can(currentUser, 'createUser');
+  async index(@Inert() inertia: Inertia) {
+    const currentUser = inertia.req?.user; // Assumes auth middleware sets user
+    const canCreateUser = await authService.can(currentUser, "createUser");
     const users = await userService.getAllUsers();
 
     const userViewModels = await Promise.all(
       users.map(async (user) => {
-        const canEditUser = await authService.can(currentUser, 'editUser', user);
+        const canEditUser = await authService.can(
+          currentUser,
+          "editUser",
+          user
+        );
         return {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           can: {
-            editUser: canEditUser
-          }
+            editUser: canEditUser,
+          },
         };
       })
     );
 
-    await res.Inertia.render('Users/Index', {
+    await inertia("Users/Index", {
       can: {
-        createUser: canCreateUser
+        createUser: canCreateUser,
       },
-      users: userViewModels
+      users: userViewModels,
     });
   }
 }
@@ -112,36 +116,36 @@ export class UsersController {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
+import Koa from "koa";
+import Router from "@koa/router";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/users', async (ctx) => {
+router.get("/users", async (ctx) => {
   const currentUser = ctx.state.user; // Assumes auth middleware sets user
-  const canCreateUser = await authService.can(currentUser, 'createUser');
+  const canCreateUser = await authService.can(currentUser, "createUser");
   const users = await userService.getAllUsers();
 
   const userViewModels = await Promise.all(
     users.map(async (user) => {
-      const canEditUser = await authService.can(currentUser, 'editUser', user);
+      const canEditUser = await authService.can(currentUser, "editUser", user);
       return {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         can: {
-          editUser: canEditUser
-        }
+          editUser: canEditUser,
+        },
       };
     })
   );
 
-  await ctx.Inertia('Users/Index', {
+  await ctx.Inertia("Users/Index", {
     can: {
-      createUser: canCreateUser
+      createUser: canCreateUser,
     },
-    users: userViewModels
+    users: userViewModels,
   });
 });
 

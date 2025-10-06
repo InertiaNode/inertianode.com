@@ -35,8 +35,8 @@ Next, setup the root template that will be loaded on the first page visit to you
 Create a root template function (typically in a separate file):
 
 ```ts
-import type { Page } from '@inertianode/core';
-import { viteAssets, inertiaHead, inertiaBody } from '@inertianode/core';
+import type { Page } from "@inertianode/core";
+import { viteAssets, inertiaHead, inertiaBody } from "@inertianode/core";
 
 export function rootTemplate(page: Page, viewData: any = {}): string {
   const ssr = viewData.ssr; // SSR response if enabled
@@ -46,7 +46,7 @@ export function rootTemplate(page: Page, viewData: any = {}): string {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    ${viteAssets('src/app.tsx')}
+    ${viteAssets("src/app.tsx")}
     ${inertiaHead(ssr?.head)}
   </head>
   <body>
@@ -72,37 +72,40 @@ Next we need to setup the Inertia middleware. The setup varies slightly between 
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
-import { inertiaHonoAdapter } from '@inertianode/hono';
-import { serveStatic } from '@hono/node-server/serve-static';
-import { rootTemplate } from './templates/root';
+import { Hono } from "hono";
+import { inertiaHonoAdapter } from "@inertianode/hono";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { rootTemplate } from "./templates/root";
 
 const app = new Hono();
 
 // Add Inertia middleware with configuration
-app.use('*', inertiaHonoAdapter({
-  html: (page) => rootTemplate(page),
-  vite: {
-    reactRefresh: true, // Enable React Fast Refresh (for React apps)
-  }
-}));
+app.use(
+  "*",
+  inertiaHonoAdapter({
+    html: (page) => rootTemplate(page),
+    vite: {
+      reactRefresh: true, // Enable React Fast Refresh (for React apps)
+    },
+  })
+);
 
 // Serve static files
-app.use('*', serveStatic({ root: './public' }));
+app.use("*", serveStatic({ root: "./public" }));
 
 // Your routes go here
-app.get('/', async (c) => {
-  return await c.Inertia('Index', {
-    title: 'Welcome'
+app.get("/", async (c) => {
+  return await c.Inertia("Index", {
+    title: "Welcome",
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
-import { inertiaExpressAdapter } from '@inertianode/express';
-import { rootTemplate } from './templates/root';
+import express from "express";
+import { inertiaExpressAdapter } from "@inertianode/express";
+import { rootTemplate } from "./templates/root";
 
 const app = express();
 
@@ -110,41 +113,43 @@ const app = express();
 app.use(express.json());
 
 // Add Inertia middleware with configuration
-app.use(inertiaExpressAdapter({
-  html: (page) => rootTemplate(page),
-  vite: {
-    reactRefresh: true, // Enable React Fast Refresh (for React apps)
-  }
-}));
+app.use(
+  inertiaExpressAdapter({
+    html: (page) => rootTemplate(page),
+    vite: {
+      reactRefresh: true, // Enable React Fast Refresh (for React apps)
+    },
+  })
+);
 
 // Serve static files
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // Your routes go here
-app.get('/', async (req, res) => {
-  await res.Inertia.render('Index', {
-    title: 'Welcome'
+app.get("/", async (req, res) => {
+  await res.Inertia.render("Index", {
+    title: "Welcome",
   });
 });
 
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { inertiaNestJSAdapter } from '@inertianode/nestjs';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { rootTemplate } from './templates/root';
-import { join } from 'path';
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { inertiaNestJSAdapter } from "@inertianode/nestjs";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { rootTemplate } from "./templates/root";
+import { join } from "path";
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, "..", "public"),
     }),
   ],
   controllers: [AppController],
@@ -157,17 +162,17 @@ export class AppModule implements NestModule {
           html: (page) => rootTemplate(page),
           vite: {
             reactRefresh: true, // Enable React Fast Refresh (for React apps)
-          }
+          },
         })
       )
-      .forRoutes('*');
+      .forRoutes("*");
   }
 }
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 }
 
 bootstrap();
@@ -175,37 +180,39 @@ bootstrap();
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
-import { inertiaKoaAdapter } from '@inertianode/koa';
-import serve from 'koa-static';
-import { rootTemplate } from './templates/root';
+import Koa from "koa";
+import Router from "@koa/router";
+import { inertiaKoaAdapter } from "@inertianode/koa";
+import serve from "koa-static";
+import { rootTemplate } from "./templates/root";
 
 const app = new Koa();
 const router = new Router();
 
 // Add Inertia middleware with configuration
-app.use(inertiaKoaAdapter({
-  html: (page) => rootTemplate(page),
-  vite: {
-    reactRefresh: true, // Enable React Fast Refresh (for React apps)
-  }
-}));
+app.use(
+  inertiaKoaAdapter({
+    html: (page) => rootTemplate(page),
+    vite: {
+      reactRefresh: true, // Enable React Fast Refresh (for React apps)
+    },
+  })
+);
 
 // Serve static files
-app.use(serve('./public'));
+app.use(serve("./public"));
 
 // Your routes go here
-router.get('/', async (ctx) => {
-  await ctx.Inertia.render('Index', {
-    title: 'Welcome'
+router.get("/", async (ctx) => {
+  await ctx.Inertia.render("Index", {
+    title: "Welcome",
   });
 });
 
 app.use(router.routes());
 
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
 ```
 
@@ -219,57 +226,57 @@ That's it, you're all ready to go server-side! Now you're ready to start creatin
 
 ```ts
 // framework: hono
-app.get('/events/:id', async (c) => {
-  const eventItem = await db.events.find(c.req.param('id'));
+app.get("/events/:id", async (c) => {
+  const eventItem = await db.events.find(c.req.param("id"));
 
   // Using the callable syntax
-  return await c.Inertia('Event/Show', {
+  return await c.Inertia("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 ```
 
 ```ts
 // framework: express
-app.get('/events/:id', async (req, res) => {
+app.get("/events/:id", async (req, res) => {
   const eventItem = await db.events.find(req.params.id);
 
   // Using the render method
-  await res.Inertia.render('Event/Show', {
+  await res.Inertia.render("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Param } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('events')
+@Controller("events")
 export class EventsController {
-  @Get(':id')
-  async show(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+  @Get(":id")
+  async show(@Param("id") id: string, @Inert() inertia: Inertia) {
     const eventItem = await db.events.find(id);
 
-    // Using the render method
-    await res.Inertia.render('Event/Show', {
+    // Using the decorator
+    await inertia("Event/Show", {
       event: {
         id: eventItem.id,
         title: eventItem.title,
         startDate: eventItem.startDate,
-        description: eventItem.description
-      }
+        description: eventItem.description,
+      },
     });
   }
 }
@@ -277,17 +284,17 @@ export class EventsController {
 
 ```ts
 // framework: koa
-router.get('/events/:id', async (ctx) => {
+router.get("/events/:id", async (ctx) => {
   const eventItem = await db.events.find(ctx.params.id);
 
   // Using the render method
-  await ctx.Inertia.render('Event/Show', {
+  await ctx.Inertia.render("Event/Show", {
     event: {
       id: eventItem.id,
       title: eventItem.title,
       startDate: eventItem.startDate,
-      description: eventItem.description
-    }
+      description: eventItem.description,
+    },
   });
 });
 ```

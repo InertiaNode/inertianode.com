@@ -36,15 +36,15 @@ app.get("/users", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { scroll } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { scroll } from "@inertianode/express";
 
 @Controller()
 export class UsersController {
-  @Get('/users')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
+  @Get("/users")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
       users: scroll(() => userService.getPaginated()),
     });
   }
@@ -906,15 +906,15 @@ app.get("/dashboard", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { scroll } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { scroll } from "@inertianode/express";
 
 @Controller()
 export class DashboardController {
-  @Get('/dashboard')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard', {
+  @Get("/dashboard")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Dashboard", {
       users: scroll(() => userService.getPaginated({ pageName: "users" })),
       orders: scroll(() => orderService.getPaginated({ pageName: "orders" })),
     });
@@ -1224,9 +1224,9 @@ app.get("/users", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { scroll } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { scroll } from "@inertianode/express";
 
 // Helper function
 function customScroll(data: PaginatedCollection) {
@@ -1238,9 +1238,9 @@ function customScroll(data: PaginatedCollection) {
 // Then use it in your routes
 @Controller()
 export class UsersController {
-  @Get('/users')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
+  @Get("/users")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
       users: customScroll(userService.getCustomPaginated()),
     });
   }

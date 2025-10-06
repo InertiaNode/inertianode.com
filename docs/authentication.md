@@ -191,26 +191,39 @@ NestJS provides a flexible authentication system through Guards and middleware. 
 
 ```ts
 // framework: nestjs
-import { Module, Injectable, CanActivate, ExecutionContext, Controller, Get, Post, Body, Req, Res, UseGuards, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import * as session from 'express-session';
-import * as passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import {
+  Module,
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  Res,
+  UseGuards,
+  NestMiddleware,
+} from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+import * as session from "express-session";
+import * as passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
 
 // Passport local strategy
 @Injectable()
 export class LocalAuthStrategy extends LocalStrategy {
   constructor() {
     super({
-      usernameField: 'email',
-      passwordField: 'password',
+      usernameField: "email",
+      passwordField: "password",
     });
   }
 
   async validate(email: string, password: string): Promise<any> {
     const user = await validateCredentials(email, password);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
     return user;
   }
@@ -229,7 +242,7 @@ export class AuthGuard implements CanActivate {
 @Injectable()
 export class ShareAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    res.Inertia.share('auth', {
+    res.Inertia.share("auth", {
       user: req.user || null,
     });
     next();
@@ -239,27 +252,27 @@ export class ShareAuthMiddleware implements NestMiddleware {
 // Auth controller
 @Controller()
 export class AuthController {
-  @Post('/login')
-  @UseGuards(passport.authenticate('local'))
-  async login(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.back();
+  @Post("/login")
+  @UseGuards(passport.authenticate("local"))
+  async login(@Inert() inertia: Inertia) {
+    await inertia.back();
   }
 
-  @Post('/logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    req.logout((err) => {
+  @Post("/logout")
+  async logout(@Inert() inertia: Inertia) {
+    inertia.req?.logout((err) => {
       if (err) {
-        return res.status(500).json({ error: 'Logout failed' });
+        throw new InternalServerErrorException("Logout failed");
       }
-      res.redirect('/');
     });
+    await inertia.redirect("/");
   }
 
-  @Get('/dashboard')
+  @Get("/dashboard")
   @UseGuards(AuthGuard)
-  async dashboard(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard', {
-      user: req.user,
+  async dashboard(@Inert() inertia: Inertia) {
+    await inertia("Dashboard", {
+      user: inertia.req?.user,
     });
   }
 }
@@ -281,7 +294,7 @@ export class AppModule implements NestModule {
           saveUninitialized: false,
           cookie: {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
           },
         }),
@@ -289,7 +302,7 @@ export class AppModule implements NestModule {
         passport.session(),
         ShareAuthMiddleware
       )
-      .forRoutes('*');
+      .forRoutes("*");
   }
 }
 ```
@@ -406,13 +419,13 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
 
 @Injectable()
 export class ShareAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    res.Inertia.share('auth', {
+    res.Inertia.share("auth", {
       user: req.user || null,
     });
     next();
@@ -525,15 +538,15 @@ app.get("/dashboard", (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class AppController {
-  @Get('/dashboard')
+  @Get("/dashboard")
   @UseGuards(AuthGuard)
-  async dashboard(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard');
+  async dashboard(@Inert() inertia: Inertia) {
+    await inertia("Dashboard");
   }
 }
 ```
@@ -587,8 +600,17 @@ app.get("/dashboard", requireAuth, (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, CanActivate, ExecutionContext, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Controller,
+  Get,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { Request, Response } from "express";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -596,7 +618,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     if (!request.isAuthenticated()) {
       const response = context.switchToHttp().getResponse();
-      response.redirect('/login');
+      response.redirect("/login");
       return false;
     }
     return true;
@@ -605,10 +627,10 @@ export class AuthGuard implements CanActivate {
 
 @Controller()
 export class AppController {
-  @Get('/dashboard')
+  @Get("/dashboard")
   @UseGuards(AuthGuard)
-  async dashboard(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard');
+  async dashboard(@Inert() inertia: Inertia) {
+    await inertia("Dashboard");
   }
 }
 ```
@@ -729,45 +751,59 @@ app.get(
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res, UseGuards, Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { AuthGuard } from '@nestjs/passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Request, Response } from 'express';
+import {
+  Controller,
+  Get,
+  Req,
+  Res,
+  UseGuards,
+  Injectable,
+} from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { AuthGuard } from "@nestjs/passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Request, Response } from "express";
 
 @Injectable()
-export class GoogleAuthStrategy extends PassportStrategy(GoogleStrategy, 'google') {
+export class GoogleAuthStrategy extends PassportStrategy(
+  GoogleStrategy,
+  "google"
+) {
   constructor() {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       callbackURL: `${process.env.APP_URL}/auth/google/callback`,
-      scope: ['profile', 'email'],
+      scope: ["profile", "email"],
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    profile: any
+  ): Promise<any> {
     const user = await findOrCreateUser({
       email: profile.emails?.[0].value,
       name: profile.displayName,
-      provider: 'google',
+      provider: "google",
     });
     return user;
   }
 }
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @Get("google")
+  @UseGuards(AuthGuard("google"))
   async googleAuth() {
     // Initiates the Google OAuth2 flow
   }
 
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    res.redirect('/dashboard');
+  @Get("google/callback")
+  @UseGuards(AuthGuard("google"))
+  async googleAuthCallback(@Inert() inertia: Inertia) {
+    await inertia.redirect("/dashboard");
   }
 }
 ```

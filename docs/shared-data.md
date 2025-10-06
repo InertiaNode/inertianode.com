@@ -8,24 +8,26 @@ Inertia's server-side adapters all provide a method of making shared data availa
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono();
 
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   // Use the request-specific Inertia instance
   // Synchronously...
-  c.Inertia.share('appName', process.env.APP_NAME);
+  c.Inertia.share("appName", process.env.APP_NAME);
 
   // Lazily...
-  c.Inertia.share('auth', () => {
-    return c.get('user') ? {
-      user: {
-        id: c.get('user').id,
-        name: c.get('user').name,
-        email: c.get('user').email
-      }
-    } : null;
+  c.Inertia.share("auth", () => {
+    return c.get("user")
+      ? {
+          user: {
+            id: c.get("user").id,
+            name: c.get("user").name,
+            email: c.get("user").email,
+          },
+        }
+      : null;
   });
 
   await next();
@@ -34,24 +36,26 @@ app.use('*', async (c, next) => {
 
 ```ts
 // framework: express
-import express from 'express';
+import express from "express";
 
 const app = express();
 
 app.use((req, res, next) => {
   // Use the request-specific Inertia instance
   // Synchronously...
-  res.Inertia.share('appName', process.env.APP_NAME);
+  res.Inertia.share("appName", process.env.APP_NAME);
 
   // Lazily...
-  res.Inertia.share('auth', () => {
-    return req.user ? {
-      user: {
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email
-      }
-    } : null;
+  res.Inertia.share("auth", () => {
+    return req.user
+      ? {
+          user: {
+            id: req.user.id,
+            name: req.user.name,
+            email: req.user.email,
+          },
+        }
+      : null;
   });
 
   next();
@@ -60,25 +64,27 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
 
 @Injectable()
 export class ShareDataMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // Use the request-specific Inertia instance
     // Synchronously...
-    res.Inertia.share('appName', process.env.APP_NAME);
+    res.Inertia.share("appName", process.env.APP_NAME);
 
     // Lazily...
-    res.Inertia.share('auth', () => {
-      return req.user ? {
-        user: {
-          id: req.user.id,
-          name: req.user.name,
-          email: req.user.email
-        }
-      } : null;
+    res.Inertia.share("auth", () => {
+      return req.user
+        ? {
+            user: {
+              id: req.user.id,
+              name: req.user.name,
+              email: req.user.email,
+            },
+          }
+        : null;
     });
 
     next();
@@ -91,24 +97,26 @@ export class ShareDataMiddleware implements NestMiddleware {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
+import Koa from "koa";
 
 const app = new Koa();
 
 app.use(async (ctx, next) => {
   // Use the request-specific Inertia instance
   // Synchronously...
-  ctx.Inertia.share('appName', process.env.APP_NAME);
+  ctx.Inertia.share("appName", process.env.APP_NAME);
 
   // Lazily...
-  ctx.Inertia.share('auth', () => {
-    return ctx.state.user ? {
-      user: {
-        id: ctx.state.user.id,
-        name: ctx.state.user.name,
-        email: ctx.state.user.email
-      }
-    } : null;
+  ctx.Inertia.share("auth", () => {
+    return ctx.state.user
+      ? {
+          user: {
+            id: ctx.state.user.id,
+            name: ctx.state.user.name,
+            email: ctx.state.user.email,
+          },
+        }
+      : null;
   });
 
   await next();
@@ -186,15 +194,15 @@ Then share the flash message on each request:
 
 ```ts
 // framework: hono (using a simple session implementation)
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono();
 
-app.use('*', async (c, next) => {
+app.use("*", async (c, next) => {
   // Use request-specific Inertia instance
-  c.Inertia.share('flash', () => {
-    const flash = c.get('flash') || {};
-    c.set('flash', {}); // Clear flash after reading
+  c.Inertia.share("flash", () => {
+    const flash = c.get("flash") || {};
+    c.set("flash", {}); // Clear flash after reading
     return flash;
   });
 
@@ -202,25 +210,27 @@ app.use('*', async (c, next) => {
 });
 
 // In your route:
-app.post('/users', async (c) => {
+app.post("/users", async (c) => {
   // Create user...
-  c.set('flash', { message: 'User created successfully!' });
-  return c.redirect('/users');
+  c.set("flash", { message: "User created successfully!" });
+  return c.redirect("/users");
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
-import session from 'express-session';
+import express from "express";
+import session from "express-session";
 
 const app = express();
 
-app.use(session({ secret: 'your-secret', resave: false, saveUninitialized: false }));
+app.use(
+  session({ secret: "your-secret", resave: false, saveUninitialized: false })
+);
 
 app.use((req, res, next) => {
   // Use request-specific Inertia instance
-  res.Inertia.share('flash', () => {
+  res.Inertia.share("flash", () => {
     const flash = req.session.flash || {};
     delete req.session.flash; // Clear flash after reading
     return flash;
@@ -230,24 +240,34 @@ app.use((req, res, next) => {
 });
 
 // In your route:
-app.post('/users', async (req, res) => {
+app.post("/users", async (req, res) => {
   // Create user...
-  req.session.flash = { message: 'User created successfully!' };
-  res.redirect('/users');
+  req.session.flash = { message: "User created successfully!" };
+  res.redirect("/users");
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Module, NestModule, MiddlewareConsumer, Injectable, NestMiddleware, Controller, Post, Req, Res } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import * as session from 'express-session';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  Injectable,
+  NestMiddleware,
+  Controller,
+  Post,
+  Body,
+} from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
+import * as session from "express-session";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Injectable()
 export class FlashMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // Use request-specific Inertia instance
-    res.Inertia.share('flash', () => {
+    res.Inertia.share("flash", () => {
       const flash = (req.session as any).flash || {};
       delete (req.session as any).flash; // Clear flash after reading
       return flash;
@@ -264,36 +284,41 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
-        session({ secret: 'your-secret', resave: false, saveUninitialized: false }),
+        session({
+          secret: "your-secret",
+          resave: false,
+          saveUninitialized: false,
+        }),
         FlashMiddleware
       )
-      .forRoutes('*');
+      .forRoutes("*");
   }
 }
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Post()
-  async store(@Req() req: Request, @Res() res: Response) {
+  async store(@Inert() inertia: Inertia) {
     // Create user...
-    (req.session as any).flash = { message: 'User created successfully!' };
-    res.redirect('/users');
+    // Note: Flash messages are typically set via request.session in middleware
+    // This redirect will pick up flash messages from the session
+    await inertia.redirect("/users");
   }
 }
 ```
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import session from 'koa-session';
+import Koa from "koa";
+import session from "koa-session";
 
 const app = new Koa();
-app.keys = ['your-secret'];
+app.keys = ["your-secret"];
 app.use(session(app));
 
 app.use(async (ctx, next) => {
   // Use request-specific Inertia instance
-  ctx.Inertia.share('flash', () => {
+  ctx.Inertia.share("flash", () => {
     const flash = ctx.session.flash || {};
     delete ctx.session.flash; // Clear flash after reading
     return flash;
@@ -303,10 +328,10 @@ app.use(async (ctx, next) => {
 });
 
 // In your route:
-router.post('/users', async (ctx) => {
+router.post("/users", async (ctx) => {
   // Create user...
-  ctx.session.flash = { message: 'User created successfully!' };
-  ctx.redirect('/users');
+  ctx.session.flash = { message: "User created successfully!" };
+  ctx.redirect("/users");
 });
 ```
 

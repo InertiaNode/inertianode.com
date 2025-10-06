@@ -10,44 +10,44 @@ To merge a prop instead of overwriting it, use the `merge()` helper when returni
 
 ```ts
 // framework: hono
-import { merge } from '@inertianode/hono';
+import { merge } from "@inertianode/hono";
 
-app.get('/posts', async (c) => {
+app.get("/posts", async (c) => {
   const posts = await postService.getPaginated();
 
-  return await c.Inertia('Posts/Index', {
-    posts: merge(posts)
+  return await c.Inertia("Posts/Index", {
+    posts: merge(posts),
   });
 });
 ```
 
 ```ts
 // framework: express
-import { merge } from '@inertianode/express';
+import { merge } from "@inertianode/express";
 
-app.get('/posts', async (req, res) => {
+app.get("/posts", async (req, res) => {
   const posts = await postService.getPaginated();
 
-  await res.Inertia('Posts/Index', {
-    posts: merge(posts)
+  await res.Inertia("Posts/Index", {
+    posts: merge(posts),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { merge } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { merge } from "@inertianode/express";
 
 @Controller()
 export class PostsController {
-  @Get('/posts')
-  async index(@Req() req: Request, @Res() res: Response) {
+  @Get("/posts")
+  async index(@Inert() inertia: Inertia) {
     const posts = await postService.getPaginated();
 
-    await res.Inertia.render('Posts/Index', {
-      posts: merge(posts)
+    await inertia("Posts/Index", {
+      posts: merge(posts),
     });
   }
 }
@@ -55,13 +55,13 @@ export class PostsController {
 
 ```ts
 // framework: koa
-import { merge } from '@inertianode/koa';
+import { merge } from "@inertianode/koa";
 
-router.get('/posts', async (ctx) => {
+router.get("/posts", async (ctx) => {
   const posts = await postService.getPaginated();
 
-  await ctx.Inertia('Posts/Index', {
-    posts: merge(posts)
+  await ctx.Inertia("Posts/Index", {
+    posts: merge(posts),
   });
 });
 ```
@@ -72,34 +72,34 @@ For nested objects, you can use `deepMerge()` to recursively merge the entire st
 
 ```ts
 // framework: hono
-import { deepMerge } from '@inertianode/hono';
+import { deepMerge } from "@inertianode/hono";
 
-return await c.Inertia('Dashboard', {
-  analytics: deepMerge(analyticsData)
+return await c.Inertia("Dashboard", {
+  analytics: deepMerge(analyticsData),
 });
 ```
 
 ```ts
 // framework: express
-import { deepMerge } from '@inertianode/express';
+import { deepMerge } from "@inertianode/express";
 
-await res.Inertia('Dashboard', {
-  analytics: deepMerge(analyticsData)
+await res.Inertia("Dashboard", {
+  analytics: deepMerge(analyticsData),
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { deepMerge } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { deepMerge } from "@inertianode/express";
 
 @Controller()
 export class DashboardController {
-  @Get('/dashboard')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Dashboard', {
-      analytics: deepMerge(analyticsData)
+  @Get("/dashboard")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Dashboard", {
+      analytics: deepMerge(analyticsData),
     });
   }
 }
@@ -107,10 +107,10 @@ export class DashboardController {
 
 ```ts
 // framework: koa
-import { deepMerge } from '@inertianode/koa';
+import { deepMerge } from "@inertianode/koa";
 
-await ctx.Inertia('Dashboard', {
-  analytics: deepMerge(analyticsData)
+await ctx.Inertia("Dashboard", {
+  analytics: deepMerge(analyticsData),
 });
 ```
 
@@ -120,35 +120,35 @@ By default, new items are appended to arrays. You can change this behavior:
 
 ```ts
 // framework: hono
-import { merge } from '@inertianode/hono';
+import { merge } from "@inertianode/hono";
 
 // Prepend new items
-return await c.Inertia('Posts/Index', {
-  posts: merge(posts).prepend()
+return await c.Inertia("Posts/Index", {
+  posts: merge(posts).prepend(),
 });
 ```
 
 ```ts
 // framework: express
-import { merge } from '@inertianode/express';
+import { merge } from "@inertianode/express";
 
-await res.Inertia('Posts/Index', {
-  posts: merge(posts).prepend()
+await res.Inertia("Posts/Index", {
+  posts: merge(posts).prepend(),
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { merge } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { merge } from "@inertianode/express";
 
 @Controller()
 export class PostsController {
-  @Get('/posts')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Posts/Index', {
-      posts: merge(posts).prepend()
+  @Get("/posts")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Posts/Index", {
+      posts: merge(posts).prepend(),
     });
   }
 }
@@ -156,10 +156,10 @@ export class PostsController {
 
 ```ts
 // framework: koa
-import { merge } from '@inertianode/koa';
+import { merge } from "@inertianode/koa";
 
-await ctx.Inertia('Posts/Index', {
-  posts: merge(posts).prepend()
+await ctx.Inertia("Posts/Index", {
+  posts: merge(posts).prepend(),
 });
 ```
 
@@ -169,35 +169,35 @@ When merging arrays, you can match existing items by a specific field and update
 
 ```ts
 // framework: hono
-import { merge } from '@inertianode/hono';
+import { merge } from "@inertianode/hono";
 
 // Match items by 'id' field
-return await c.Inertia('Users/Index', {
-  users: merge(users).matchOn('id')
+return await c.Inertia("Users/Index", {
+  users: merge(users).matchOn("id"),
 });
 ```
 
 ```ts
 // framework: express
-import { merge } from '@inertianode/express';
+import { merge } from "@inertianode/express";
 
-await res.Inertia('Users/Index', {
-  users: merge(users).matchOn('id')
+await res.Inertia("Users/Index", {
+  users: merge(users).matchOn("id"),
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { merge } from '@inertianode/express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { merge } from "@inertianode/express";
 
 @Controller()
 export class UsersController {
-  @Get('/users')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
-      users: merge(users).matchOn('id')
+  @Get("/users")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
+      users: merge(users).matchOn("id"),
     });
   }
 }
@@ -205,10 +205,10 @@ export class UsersController {
 
 ```ts
 // framework: koa
-import { merge } from '@inertianode/koa';
+import { merge } from "@inertianode/koa";
 
-await ctx.Inertia('Users/Index', {
-  users: merge(users).matchOn('id')
+await ctx.Inertia("Users/Index", {
+  users: merge(users).matchOn("id"),
 });
 ```
 

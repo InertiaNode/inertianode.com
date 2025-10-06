@@ -8,50 +8,50 @@ To defer a prop, you can use the `defer()` helper when returning your response. 
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
-import { defer } from '@inertianode/hono';
+import { Hono } from "hono";
+import { defer } from "@inertianode/hono";
 
 const app = new Hono();
 
-app.get('/users', async (c) => {
-  return await c.Inertia('Users/Index', {
+app.get("/users", async (c) => {
+  return await c.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
-    permissions: defer(() => permissionService.getAll())
+    permissions: defer(() => permissionService.getAll()),
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
-import { defer } from '@inertianode/express';
+import express from "express";
+import { defer } from "@inertianode/express";
 
 const app = express();
 
-app.get('/users', async (req, res) => {
-  await res.Inertia('Users/Index', {
+app.get("/users", async (req, res) => {
+  await res.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
-    permissions: defer(() => permissionService.getAll())
+    permissions: defer(() => permissionService.getAll()),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { defer } from '@inertianode/nestjs';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { defer } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
       users: userService.getAll(),
       roles: roleService.getAll(),
-      permissions: defer(() => permissionService.getAll())
+      permissions: defer(() => permissionService.getAll()),
     });
   }
 }
@@ -59,18 +59,18 @@ export class UsersController {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
-import { defer } from '@inertianode/koa';
+import Koa from "koa";
+import Router from "@koa/router";
+import { defer } from "@inertianode/koa";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/users', async (ctx) => {
-  await ctx.Inertia('Users/Index', {
+router.get("/users", async (ctx) => {
+  await ctx.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
-    permissions: defer(() => permissionService.getAll())
+    permissions: defer(() => permissionService.getAll()),
   });
 });
 
@@ -83,59 +83,59 @@ By default, all deferred props get fetched in one request after the initial page
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
-import { defer } from '@inertianode/hono';
+import { Hono } from "hono";
+import { defer } from "@inertianode/hono";
 
 const app = new Hono();
 
-app.get('/users', async (c) => {
-  return await c.Inertia('Users/Index', {
+app.get("/users", async (c) => {
+  return await c.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
     permissions: defer(() => permissionService.getAll()),
-    teams: defer(() => teamService.getAll(), 'attributes'),
-    projects: defer(() => projectService.getAll(), 'attributes'),
-    tasks: defer(() => taskService.getAll(), 'attributes')
+    teams: defer(() => teamService.getAll(), "attributes"),
+    projects: defer(() => projectService.getAll(), "attributes"),
+    tasks: defer(() => taskService.getAll(), "attributes"),
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
-import { defer } from '@inertianode/express';
+import express from "express";
+import { defer } from "@inertianode/express";
 
 const app = express();
 
-app.get('/users', async (req, res) => {
-  await res.Inertia('Users/Index', {
+app.get("/users", async (req, res) => {
+  await res.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
     permissions: defer(() => permissionService.getAll()),
-    teams: defer(() => teamService.getAll(), 'attributes'),
-    projects: defer(() => projectService.getAll(), 'attributes'),
-    tasks: defer(() => taskService.getAll(), 'attributes')
+    teams: defer(() => teamService.getAll(), "attributes"),
+    projects: defer(() => projectService.getAll(), "attributes"),
+    tasks: defer(() => taskService.getAll(), "attributes"),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { defer } from '@inertianode/nestjs';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
+import { defer } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
       users: userService.getAll(),
       roles: roleService.getAll(),
       permissions: defer(() => permissionService.getAll()),
-      teams: defer(() => teamService.getAll(), 'attributes'),
-      projects: defer(() => projectService.getAll(), 'attributes'),
-      tasks: defer(() => taskService.getAll(), 'attributes')
+      teams: defer(() => teamService.getAll(), "attributes"),
+      projects: defer(() => projectService.getAll(), "attributes"),
+      tasks: defer(() => taskService.getAll(), "attributes"),
     });
   }
 }
@@ -143,21 +143,21 @@ export class UsersController {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
-import { defer } from '@inertianode/koa';
+import Koa from "koa";
+import Router from "@koa/router";
+import { defer } from "@inertianode/koa";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/users', async (ctx) => {
-  await ctx.Inertia('Users/Index', {
+router.get("/users", async (ctx) => {
+  await ctx.Inertia("Users/Index", {
     users: userService.getAll(),
     roles: roleService.getAll(),
     permissions: defer(() => permissionService.getAll()),
-    teams: defer(() => teamService.getAll(), 'attributes'),
-    projects: defer(() => projectService.getAll(), 'attributes'),
-    tasks: defer(() => taskService.getAll(), 'attributes')
+    teams: defer(() => teamService.getAll(), "attributes"),
+    projects: defer(() => projectService.getAll(), "attributes"),
+    tasks: defer(() => taskService.getAll(), "attributes"),
   });
 });
 

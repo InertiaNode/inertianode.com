@@ -1456,29 +1456,29 @@ app.post("/users", async (req, res) => {
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
+  async index(@Inert() inertia: Inertia) {
     const users = await userService.getAll();
-    await res.Inertia.render('Users/Index', {
+    await inertia("Users/Index", {
       users,
     });
   }
 
   @Post()
-  async store(@Body() request: any, @Req() req: Request, @Res() res: Response) {
+  async store(@Body() request: any, @Inert() inertia: Inertia) {
     // Validate request
     const errors = validateUser(request);
     if (errors) {
-      return res.status(422).json({ errors });
+      throw new UnprocessableEntityException({ errors });
     }
 
     await userService.create(request);
-    await res.Inertia.location('/users');
+    await inertia.location("/users");
   }
 }
 ```

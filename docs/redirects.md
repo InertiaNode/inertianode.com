@@ -6,122 +6,125 @@ For example, if your controller is creating a new user, your "store" endpoint sh
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 // Hono uses per-request Inertia instance (c.Inertia);
 
 const app = new Hono();
 
-app.get('/users', async (c) => {
+app.get("/users", async (c) => {
   const users = await userService.getAllUsers();
-  return await c.Inertia('Users/Index', {
-    users
+  return await c.Inertia("Users/Index", {
+    users,
   });
 });
 
-app.post('/users', async (c) => {
+app.post("/users", async (c) => {
   const { name, email } = await c.req.json();
 
   // Validate request
   if (!name || !email) {
-    return c.json({ error: 'Invalid request' }, 400);
+    return c.json({ error: "Invalid request" }, 400);
   }
 
   await userService.createUser({ name, email });
 
   // Redirect back to previous page, or to /users as fallback
-  return c.redirect(c.req.header('Referer') || '/users', 303);
+  return c.redirect(c.req.header("Referer") || "/users", 303);
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
+import express from "express";
 
 const app = express();
 
-app.get('/users', async (req, res) => {
+app.get("/users", async (req, res) => {
   const users = await userService.getAllUsers();
-  await res.Inertia('Users/Index', {
-    users
+  await res.Inertia("Users/Index", {
+    users,
   });
 });
 
-app.post('/users', async (req, res) => {
+app.post("/users", async (req, res) => {
   const { name, email } = req.body;
 
   // Validate request
   if (!name || !email) {
-    return res.status(400).json({ error: 'Invalid request' });
+    return res.status(400).json({ error: "Invalid request" });
   }
 
   await userService.createUser({ name, email });
 
   // Redirect back to previous page
-  res.Inertia.back('/users');
+  res.Inertia.back("/users");
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
+  async index(@Inert() inertia: Inertia) {
     const users = await userService.getAllUsers();
-    await res.Inertia.render('Users/Index', {
-      users
+    await inertia("Users/Index", {
+      users,
     });
   }
 
   @Post()
-  async store(@Body() body: { name: string; email: string }, @Req() req: Request, @Res() res: Response) {
+  async store(
+    @Body() body: { name: string; email: string },
+    @Inert() inertia: Inertia
+  ) {
     const { name, email } = body;
 
     // Validate request
     if (!name || !email) {
-      return res.status(400).json({ error: 'Invalid request' });
+      throw new BadRequestException("Invalid request");
     }
 
     await userService.createUser({ name, email });
 
     // Redirect back to previous page
-    res.Inertia.back('/users');
+    await inertia.back("/users");
   }
 }
 ```
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
+import Koa from "koa";
+import Router from "@koa/router";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/users', async (ctx) => {
+router.get("/users", async (ctx) => {
   const users = await userService.getAllUsers();
-  await ctx.Inertia('Users/Index', {
-    users
+  await ctx.Inertia("Users/Index", {
+    users,
   });
 });
 
-router.post('/users', async (ctx) => {
+router.post("/users", async (ctx) => {
   const { name, email } = ctx.request.body;
 
   // Validate request
   if (!name || !email) {
     ctx.status = 400;
-    ctx.body = { error: 'Invalid request' };
+    ctx.body = { error: "Invalid request" };
     return;
   }
 
   await userService.createUser({ name, email });
 
   // Redirect back to previous page
-  ctx.Inertia.back('/users');
+  ctx.Inertia.back("/users");
 });
 
 app.use(router.routes());
@@ -135,31 +138,29 @@ The `back()` method automatically uses a `303` status code. For manual redirects
 
 ```ts
 // framework: hono
-return c.redirect('/users', 303);
+return c.redirect("/users", 303);
 ```
 
 ```ts
 // framework: express
-res.redirect(303, '/users');
+res.redirect(303, "/users");
 // Or use back() which handles it automatically
-res.Inertia.back('/users');
+res.Inertia.back("/users");
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Put, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Put, Param } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
-  @Put(':id')
-  async update(@Req() req: Request, @Res() res: Response) {
+  @Put(":id")
+  async update(@Param("id") id: string, @Inert() inertia: Inertia) {
     // Update user logic...
 
-    // Use 303 status for redirect after PUT/PATCH/DELETE
-    res.redirect(303, '/users');
-    // Or use back() which handles it automatically
-    res.Inertia.back('/users');
+    // Use back() which handles 303 status automatically
+    await inertia.back("/users");
   }
 }
 ```
@@ -167,9 +168,9 @@ export class UsersController {
 ```ts
 // framework: koa
 ctx.status = 303;
-ctx.redirect('/users');
+ctx.redirect("/users");
 // Or use back() which handles it automatically
-ctx.Inertia.back('/users');
+ctx.Inertia.back("/users");
 ```
 
 ## External redirects
@@ -178,33 +179,33 @@ Sometimes it's necessary to redirect to an external website, or even another non
 
 ```ts
 // framework: hono
-app.get('/external-redirect', async (c) => {
-  return c.Inertia.location('https://example.com');
+app.get("/external-redirect", async (c) => {
+  return c.Inertia.location("https://example.com");
 });
 ```
 
 ```ts
 // framework: express
-return res.Inertia.location('https://example.com');
+return res.Inertia.location("https://example.com");
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class AppController {
-  @Get('/external-redirect')
-  async externalRedirect(@Req() req: Request, @Res() res: Response) {
-    return res.Inertia.location('https://example.com');
+  @Get("/external-redirect")
+  async externalRedirect(@Inert() inertia: Inertia) {
+    return await inertia.location("https://example.com");
   }
 }
 ```
 
 ```ts
 // framework: koa
-return ctx.Inertia.location('https://example.com');
+return ctx.Inertia.location("https://example.com");
 ```
 
 The `location()` method will generate a `409 Conflict` response and include the destination URL in the `X-Inertia-Location` header. When this response is received client-side, Inertia will automatically perform a `window.location = url` visit.

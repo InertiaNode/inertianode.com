@@ -10,39 +10,39 @@ To pass data to a page component, use `Inertia()`.
 
 ```ts
 // framework: hono
-app.get('/posts', async (c) => {
+app.get("/posts", async (c) => {
   const posts = await db.posts.findMany();
 
-  return await c.Inertia('Posts', {
-    posts
+  return await c.Inertia("Posts", {
+    posts,
   });
 });
 ```
 
 ```ts
 // framework: express
-app.get('/posts', async (req, res) => {
+app.get("/posts", async (req, res) => {
   const posts = await db.posts.findMany();
 
-  await res.Inertia('Posts', {
-    posts
+  await res.Inertia("Posts", {
+    posts,
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class PostsController {
-  @Get('/posts')
-  async index(@Req() req: Request, @Res() res: Response) {
+  @Get("/posts")
+  async index(@Inert() inertia: Inertia) {
     const posts = await db.posts.findMany();
 
-    await res.Inertia.render('Posts', {
-      posts
+    await inertia("Posts", {
+      posts,
     });
   }
 }
@@ -50,11 +50,11 @@ export class PostsController {
 
 ```ts
 // framework: koa
-router.get('/posts', async (ctx) => {
+router.get("/posts", async (ctx) => {
   const posts = await db.posts.findMany();
 
-  await ctx.Inertia('Posts', {
-    posts
+  await ctx.Inertia("Posts", {
+    posts,
   });
 });
 ```
@@ -63,82 +63,82 @@ To make a form endpoint, remember that the request data is passed using JSON.
 
 ```ts
 // framework: hono
-app.post('/posts', async (c) => {
+app.post("/posts", async (c) => {
   const post = await c.req.json();
 
   // Validation errors are passed automatically
   const errors = validatePost(post);
   if (errors) {
-    return await c.Inertia('Posts/Create', {
+    return await c.Inertia("Posts/Create", {
       errors,
-      post
+      post,
     });
   }
 
   await db.posts.create(post);
-  return c.redirect('/posts');
+  return c.redirect("/posts");
 });
 ```
 
 ```ts
 // framework: express
-app.post('/posts', async (req, res) => {
+app.post("/posts", async (req, res) => {
   const post = req.body;
 
   // Validation errors are passed automatically
   const errors = validatePost(post);
   if (errors) {
-    return await res.Inertia('Posts/Create', {
+    return await res.Inertia("Posts/Create", {
       errors,
-      post
+      post,
     });
   }
 
   await db.posts.create(post);
-  res.redirect('/posts');
+  res.redirect("/posts");
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Post, Req, Res, Body } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Post, Body } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class PostsController {
-  @Post('/posts')
-  async create(@Body() post: any, @Req() req: Request, @Res() res: Response) {
+  @Post("/posts")
+  async create(@Body() post: any, @Inert() inertia: Inertia) {
     // Validation errors are passed automatically
     const errors = validatePost(post);
     if (errors) {
-      return await res.Inertia.render('Posts/Create', {
+      return await inertia("Posts/Create", {
         errors,
-        post
+        post,
       });
     }
 
     await db.posts.create(post);
-    res.redirect('/posts');
+    await inertia.redirect("/posts");
   }
 }
 ```
 
 ```ts
 // framework: koa
-router.post('/posts', async (ctx) => {
+router.post("/posts", async (ctx) => {
   const post = ctx.request.body;
 
   // Validation errors are passed automatically
   const errors = validatePost(post);
   if (errors) {
-    return await ctx.Inertia('Posts/Create', {
+    return await ctx.Inertia("Posts/Create", {
       errors,
-      post
+      post,
     });
   }
 
   await db.posts.create(post);
-  ctx.redirect('/posts');
+  ctx.redirect("/posts");
 });
 ```
 
@@ -150,18 +150,18 @@ You can add some shared data to your views using middleware:
 
 ```ts
 // framework: hono
-app.use('*', async (c, next) => {
-  const userId = c.get('userId'); // From session middleware
+app.use("*", async (c, next) => {
+  const userId = c.get("userId"); // From session middleware
 
-  c.Inertia.share('auth', {
-    userId
+  c.Inertia.share("auth", {
+    userId,
   });
 
   // Or using an object
   c.Inertia.share({
     auth: {
-      userId
-    }
+      userId,
+    },
   });
 
   await next();
@@ -173,15 +173,15 @@ app.use('*', async (c, next) => {
 app.use((req, res, next) => {
   const userId = req.session.userId;
 
-  res.Inertia.share('auth', {
-    userId
+  res.Inertia.share("auth", {
+    userId,
   });
 
   // Or using an object
   res.Inertia.share({
     auth: {
-      userId
-    }
+      userId,
+    },
   });
 
   next();
@@ -190,23 +190,23 @@ app.use((req, res, next) => {
 
 ```ts
 // framework: nestjs
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Request, Response, NextFunction } from "express";
 
 @Injectable()
 export class InertiaSharedDataMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).session.userId;
 
-    res.Inertia.share('auth', {
-      userId
+    res.Inertia.share("auth", {
+      userId,
     });
 
     // Or using an object
     res.Inertia.share({
       auth: {
-        userId
-      }
+        userId,
+      },
     });
 
     next();
@@ -219,15 +219,15 @@ export class InertiaSharedDataMiddleware implements NestMiddleware {
 app.use(async (ctx, next) => {
   const userId = ctx.session.userId;
 
-  ctx.Inertia.share('auth', {
-    userId
+  ctx.Inertia.share("auth", {
+    userId,
   });
 
   // Or using an object
   ctx.Inertia.share({
     auth: {
-      userId
-    }
+      userId,
+    },
   });
 
   await next();
@@ -240,33 +240,33 @@ You can use lazy props to load data asynchronously. This is useful for loading d
 
 ```ts
 // framework: hono
-app.get('/posts', async (c) => {
-  return await c.Inertia('Posts', {
-    posts: async () => await db.posts.findMany()
+app.get("/posts", async (c) => {
+  return await c.Inertia("Posts", {
+    posts: async () => await db.posts.findMany(),
   });
 });
 ```
 
 ```ts
 // framework: express
-app.get('/posts', async (req, res) => {
-  await res.Inertia('Posts', {
-    posts: async () => await db.posts.findMany()
+app.get("/posts", async (req, res) => {
+  await res.Inertia("Posts", {
+    posts: async () => await db.posts.findMany(),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
 @Controller()
 export class PostsController {
-  @Get('/posts')
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Posts', {
-      posts: async () => await db.posts.findMany()
+  @Get("/posts")
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Posts", {
+      posts: async () => await db.posts.findMany(),
     });
   }
 }
@@ -274,9 +274,9 @@ export class PostsController {
 
 ```ts
 // framework: koa
-router.get('/posts', async (ctx) => {
-  await ctx.Inertia('Posts', {
-    posts: async () => await db.posts.findMany()
+router.get("/posts", async (ctx) => {
+  await ctx.Inertia("Posts", {
+    posts: async () => await db.posts.findMany(),
   });
 });
 ```

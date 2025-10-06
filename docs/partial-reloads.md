@@ -115,45 +115,45 @@ For partial reloads to be most effective, be sure to also use lazy data evaluati
 
 ```ts
 // framework: hono
-import { Hono } from 'hono';
+import { Hono } from "hono";
 // Hono uses per-request Inertia instance (c.Inertia);
 
 const app = new Hono();
 
-app.get('/users', async (c) => {
-  return await c.Inertia('Users/Index', {
+app.get("/users", async (c) => {
+  return await c.Inertia("Users/Index", {
     users: () => userService.getAll(),
-    companies: () => companyService.getAll()
+    companies: () => companyService.getAll(),
   });
 });
 ```
 
 ```ts
 // framework: express
-import express from 'express';
+import express from "express";
 
 const app = express();
 
-app.get('/users', async (req, res) => {
-  await res.Inertia('Users/Index', {
+app.get("/users", async (req, res) => {
+  await res.Inertia("Users/Index", {
     users: () => userService.getAll(),
-    companies: () => companyService.getAll()
+    companies: () => companyService.getAll(),
   });
 });
 ```
 
 ```ts
 // framework: nestjs
-import { Controller, Get, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get } from "@nestjs/common";
+import { Inert, type Inertia } from "@inertianode/nestjs";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Get()
-  async index(@Req() req: Request, @Res() res: Response) {
-    await res.Inertia.render('Users/Index', {
+  async index(@Inert() inertia: Inertia) {
+    await inertia("Users/Index", {
       users: () => userService.getAll(),
-      companies: () => companyService.getAll()
+      companies: () => companyService.getAll(),
     });
   }
 }
@@ -161,16 +161,16 @@ export class UsersController {
 
 ```ts
 // framework: koa
-import Koa from 'koa';
-import Router from '@koa/router';
+import Koa from "koa";
+import Router from "@koa/router";
 
 const app = new Koa();
 const router = new Router();
 
-router.get('/users', async (ctx) => {
-  await ctx.Inertia('Users/Index', {
+router.get("/users", async (ctx) => {
+  await ctx.Inertia("Users/Index", {
     users: () => userService.getAll(),
-    companies: () => companyService.getAll()
+    companies: () => companyService.getAll(),
   });
 });
 
@@ -185,37 +185,37 @@ Additionally, InertiaNode provides an `optional()` helper to specify that a prop
 
 ```ts
 // framework: hono
-import { optional } from '@inertianode/hono';
+import { optional } from "@inertianode/hono";
 
-return await c.Inertia('Users/Index', {
-  users: optional(() => userService.getAll())
+return await c.Inertia("Users/Index", {
+  users: optional(() => userService.getAll()),
 });
 ```
 
 ```ts
 // framework: express
-import { optional } from '@inertianode/express';
+import { optional } from "@inertianode/express";
 
-await res.Inertia('Users/Index', {
-  users: optional(() => userService.getAll())
+await res.Inertia("Users/Index", {
+  users: optional(() => userService.getAll()),
 });
 ```
 
 ```ts
 // framework: nestjs
-import { optional } from '@inertianode/nestjs';
+import { optional } from "@inertianode/nestjs";
 
-await res.Inertia.render('Users/Index', {
-  users: optional(() => userService.getAll())
+await res.Inertia.render("Users/Index", {
+  users: optional(() => userService.getAll()),
 });
 ```
 
 ```ts
 // framework: koa
-import { optional } from '@inertianode/koa';
+import { optional } from "@inertianode/koa";
 
-await ctx.Inertia('Users/Index', {
-  users: optional(() => userService.getAll())
+await ctx.Inertia("Users/Index", {
+  users: optional(() => userService.getAll()),
 });
 ```
 
@@ -223,37 +223,37 @@ On the inverse, you can use the `always()` helper to specify that a prop should 
 
 ```ts
 // framework: hono
-import { always } from '@inertianode/hono';
+import { always } from "@inertianode/hono";
 
-return await c.Inertia('Users/Index', {
-  users: always(userService.getAll())
+return await c.Inertia("Users/Index", {
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: express
-import { always } from '@inertianode/express';
+import { always } from "@inertianode/express";
 
-await res.Inertia('Users/Index', {
-  users: always(userService.getAll())
+await res.Inertia("Users/Index", {
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: nestjs
-import { always } from '@inertianode/nestjs';
+import { always } from "@inertianode/nestjs";
 
-await res.Inertia.render('Users/Index', {
-  users: always(userService.getAll())
+await res.Inertia.render("Users/Index", {
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: koa
-import { always } from '@inertianode/koa';
+import { always } from "@inertianode/koa";
 
-await ctx.Inertia('Users/Index', {
-  users: always(userService.getAll())
+await ctx.Inertia("Users/Index", {
+  users: always(userService.getAll()),
 });
 ```
 
@@ -261,7 +261,7 @@ Here's a summary of each approach:
 
 ```ts
 // framework: hono
-return await c.Inertia('Users/Index', {
+return await c.Inertia("Users/Index", {
   // ALWAYS included on standard visits
   // OPTIONALLY included on partial reloads
   // ALWAYS evaluated
@@ -280,13 +280,13 @@ return await c.Inertia('Users/Index', {
   // ALWAYS included on standard visits
   // ALWAYS included on partial reloads
   // ALWAYS evaluated
-  users: always(userService.getAll())
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: express
-await res.Inertia('Users/Index', {
+await res.Inertia("Users/Index", {
   // ALWAYS included on standard visits
   // OPTIONALLY included on partial reloads
   // ALWAYS evaluated
@@ -305,13 +305,13 @@ await res.Inertia('Users/Index', {
   // ALWAYS included on standard visits
   // ALWAYS included on partial reloads
   // ALWAYS evaluated
-  users: always(userService.getAll())
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: nestjs
-await res.Inertia.render('Users/Index', {
+await res.Inertia.render("Users/Index", {
   // ALWAYS included on standard visits
   // OPTIONALLY included on partial reloads
   // ALWAYS evaluated
@@ -330,13 +330,13 @@ await res.Inertia.render('Users/Index', {
   // ALWAYS included on standard visits
   // ALWAYS included on partial reloads
   // ALWAYS evaluated
-  users: always(userService.getAll())
+  users: always(userService.getAll()),
 });
 ```
 
 ```ts
 // framework: koa
-await ctx.Inertia('Users/Index', {
+await ctx.Inertia("Users/Index", {
   // ALWAYS included on standard visits
   // OPTIONALLY included on partial reloads
   // ALWAYS evaluated
@@ -355,6 +355,6 @@ await ctx.Inertia('Users/Index', {
   // ALWAYS included on standard visits
   // ALWAYS included on partial reloads
   // ALWAYS evaluated
-  users: always(userService.getAll())
+  users: always(userService.getAll()),
 });
 ```
